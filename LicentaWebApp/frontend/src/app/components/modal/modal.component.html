@@ -1,0 +1,16 @@
+<div class="unreachable-background" *ngIf="isOpen">
+  <div class="modal-element">
+    <div class="modal-header d-flex justify-content-between" *ngIf="showHeader">
+      <div class="modal-title">
+        <h4 style="color: white; margin: 0px;">{{title}} </h4>
+      </div>
+      <div >
+        <button type="button" class=" btn-close btn btn-danger" aria-label="Close" (click)="hideModal()"></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <ng-content>
+      </ng-content>
+    </div>
+  </div>
+</div>

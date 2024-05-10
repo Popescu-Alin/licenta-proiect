@@ -1,0 +1,23 @@
+<div class="d-flex justify-content-center align-items-center">
+  <div class="d-flex flex-column">
+    <form class="form-group" [formGroup]="loginForm">
+      <fieldset class="m-1">
+        <input type="email" placeholder="email" class="form-control" formControlName="email" [ngClass]="{'is-valid': !loginForm.controls['email'].invalid, 'is-invalid': loginForm.controls['email'].invalid && !loginForm.controls['email'].untouched}">
+        <div *ngIf="loginForm.controls['email'].errors?.['email']" class="invalid-feedback">Not an email</div>
+        <div *ngIf="loginForm.controls['email'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+      <fieldset class="m-1">
+        <input type="password" placeholder="password" class="form-control" formControlName="password" [ngClass]="{'is-valid': !loginForm.controls['password'].invalid, 'is-invalid': loginForm.controls['password'].invalid && !loginForm.controls['password'].untouched}">
+        <div *ngIf="loginForm.controls['password'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-primary d-flex"  [disabled]="loginForm.invalid || isLoading" (click)="loginSubmit()"><span *ngIf="isLoading" class="loader"></span> Login </button> 
+      </div>
+    </form>
+
+    <div class="d-flex justify-content-center">
+      <button type="button" class="btn btn-link" (click)="goToSignUpPage()"> Not registered? Create an account! </button>
+    </div>
+  </div>
+</div>
+<app-email-not-confirmed-modal [email]="email" (closeModalEmitter)="closeModal()" [isModalOpen]="showConfirmEmail"></app-email-not-confirmed-modal>

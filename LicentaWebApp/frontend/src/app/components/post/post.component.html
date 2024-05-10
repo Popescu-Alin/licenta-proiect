@@ -1,0 +1,12 @@
+<div class="card mb-3">
+  <h3 class="card-header">{{postResponse!.userInfo?.userName}}</h3>
+  
+  <img src={{postResponse?.post?.url}} class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image " focusable="false"/>
+  <div class="card-body">
+    <p class="card-text">{{postResponse!.post?.content}}</p>
+  </div>
+
+  <div class="card-footer text-muted">
+    {{postResponse!.post?.createdDate | date:'short'}}
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="d-flex justify-content-center align-items-center">
+  <div class="d-flex flex-column">
+    <form class="form-group" [formGroup]="registerForm">
+      
+      <fieldset class="m-1">
+        <label class="col-sm-5 col-form-label">First name</label>
+        <input type="text" placeholder="John" class="form-control" formControlName="firstName" [ngClass]="{'is-valid': !registerForm.controls['firstName'].invalid, 'is-invalid': registerForm.controls['firstName'].invalid && !registerForm.controls['firstName'].untouched}">
+        <div *ngIf="registerForm.controls['firstName'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+      <fieldset class="m-1">
+        <label class="col-sm-5 col-form-label">Last name</label>
+        <input type="text" placeholder="Doe" class="form-control" formControlName="lastName" [ngClass]="{'is-valid': !registerForm.controls['lastName'].invalid, 'is-invalid': registerForm.controls['lastName'].invalid && !registerForm.controls['lastName'].untouched}">
+        <div *ngIf="registerForm.controls['lastName'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+
+      <fieldset class="m-1">
+        <label class="col-sm-2 col-form-label">Username</label>
+        <input type="text" placeholder="Username" class="form-control" formControlName="userName" [ngClass]="{'is-valid': !registerForm.controls['userName'].invalid, 'is-invalid': registerForm.controls['userName'].invalid && !registerForm.controls['userName'].untouched}">
+        <div *ngIf="registerForm.controls['userName'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+
+      <fieldset class="m-1">
+        <label class="col-sm-2 col-form-label">Email</label>
+        <input type="email" placeholder="email" class="form-control" formControlName="email" [ngClass]="{'is-valid': !registerForm.controls['email'].invalid, 'is-invalid': registerForm.controls['email'].invalid && !registerForm.controls['email'].untouched}">
+        <div *ngIf="registerForm.controls['email'].errors?.['email']" class="invalid-feedback">Not an email</div>
+        <div *ngIf="registerForm.controls['email'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+
+      <fieldset class="m-1">
+        <label class="col-sm-2 col-form-label">Password</label>
+        <input type="password" placeholder="password" class="form-control" formControlName="password" [ngClass]="{'is-valid': !registerForm.controls['password'].invalid, 'is-invalid': registerForm.controls['password'].invalid && !registerForm.controls['password'].untouched}">
+        <div *ngIf="registerForm.controls['password'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+      </fieldset>
+
+      <fieldset class="m-1">
+        <label class=" col-form-label">Confirm password</label>
+        <input type="password" placeholder="passwordConfirm" class="form-control" formControlName="passwordConfirm" [ngClass]="{'is-valid': !registerForm.controls['passwordConfirm'].invalid, 'is-invalid': registerForm.controls['passwordConfirm'].invalid && !registerForm.controls['passwordConfirm'].untouched}">
+        <div *ngIf="registerForm.controls['passwordConfirm'].errors?.['required']" class="invalid-feedback">Value is requierd</div>
+        <div *ngIf="registerForm.controls['passwordConfirm'].errors?.['matchValues']" class="invalid-feedback">Passwords are not the same</div>
+      </fieldset>
+    
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-primary d-flex" [disabled]="registerForm.invalid || isLoading"  (click)="submintRegister()"><span *ngIf="isLoading" class="loader"></span> Register </button> 
+      </div>
+    </form>
+  </div>
+</div>
