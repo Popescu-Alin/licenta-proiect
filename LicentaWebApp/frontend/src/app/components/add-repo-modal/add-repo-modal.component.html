@@ -1,0 +1,24 @@
+<app-modal [isOpen]="isModalOpen"
+           [title]="''"
+           (closeModalEmitter)="closeModalEmitter.emit()">
+           
+  <form class="d-flex flex-column" [formGroup]="repoForm">
+
+    <div class="form-group">
+      <label class="form-label mt-4">Title</label>
+      <input type="text" class="form-control" formControlName="title"  placeholder="Title">
+      <div *ngIf="repoForm.controls['title'].errors?.['requierd']" class="invalid-feedback">Value is required</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label mt-4">Access modifier</label> 
+      <select class="form-control" formControlName="accessModifier">
+        <option value="Public" selected="Public">Public</option>
+        <option value="Private">Private</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2" [disabled]="repoForm.invalid || isLoading" (click)="addRepo()"> <span class="loader" *ngIf="isLoading"></span>Add repository</button>
+
+  </form>
+</app-modal>

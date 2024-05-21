@@ -1,0 +1,24 @@
+<div *ngIf="repositoryResponse">
+  <div class="card mb-3 w-500">
+    <div class="card-header d-flex justify-content-between ">
+
+      <div>
+        <span>
+          {{repositoryResponse.repository!.title}}
+        </span>
+      </div>
+
+
+      <span class="text-muted align-self-center pi "
+        [ngClass]="{'pi-globe': repositoryResponse.repository!.accessModifier == accessModifiers.Public, 'pi-lock':repositoryResponse.repository!.accessModifier == accessModifiers.Private}"></span>
+    </div>
+    <img src="" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image "
+      focusable="false" />
+    <div class="card-footer text-muted">
+      <div class="d-flex justify-content-between">
+        <span class="pi pi-users">{{repositoryResponse.numberOfUsers}}</span>
+        <span class="pi pi-file-o">{{repositoryResponse.numberOfPosts}}</span>
+      </div>
+    </div>
+  </div>
+</div>

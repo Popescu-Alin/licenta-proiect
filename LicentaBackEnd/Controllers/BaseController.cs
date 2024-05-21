@@ -8,6 +8,7 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using LicentaBackEnd.DBContext;
 using System.Net;
+using LicentaBackEnd.Constants;
 
 namespace LicentaBackEnd.Controllers
 {
@@ -62,7 +63,7 @@ namespace LicentaBackEnd.Controllers
                 return BadRequest();
             }
             
-            return new BadRequestObjectResult("An error occurred!");
+           
         }
 
         [HttpPut]
@@ -135,26 +136,32 @@ namespace LicentaBackEnd.Controllers
         [Route("posts/get-posts/{take}/{offSet}")]
         public async Task<ActionResult<IEnumerable<PostResponse>>> GetPosts(int take, int offSet)
         {
+            Guid userId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
             try
             {
-                List<Post> postList = PostService.GetMany().OrderByDescending(post => post.Id).Skip(offSet).Take(take).ToList();
-                List<Guid> postsIds = postList.Select(post => post.Id).ToList();
-                IQueryable<BasicUserInfo> users = UserService.GetMany().Select(user => new BasicUserInfo { UserId = user.Id, UserName = user.UserName });
-                IQueryable<Comment> comments = CommentService.GetMany(comment => postsIds.Contains(comment.PostId));
-                IQueryable<Like> likes = LikeService.GetMany(like => postsIds.Contains(like.PostId));
-                List<PostResponse> postResponses = postList.Join(users, post => post.UserId, user => user.UserId, (post, user) => new PostResponse { Post = post, UserInfo = user }).ToList();
-                foreach (PostResponse postResponse in postResponses)
-                {
-                    postResponse.NumberOfComments = comments.Where(comment => comment.PostId == postResponse.Post.Id).Count();
-                    postResponse.NumberOfLikes = likes.Where(like => like.PostId == postResponse.Post.Id).Count();
-                }
-
-                
-                return postResponses;
+                return PostService.getPostResponses(null, take, offSet, userId);
             }
             catch
             {
-                return  BadRequest();
+                return BadRequest();
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("posts/get-posts-by-usreId/{take}/{offSet}/{userId}")]
+        public async Task<ActionResult<IEnumerable<PostResponse>>> getPostsByUserId(int take, int offSet, Guid userId)
+        {
+            
+            try
+            {
+                return PostService.getPostResponses(post=>post.UserId == userId,take,offSet ,userId);
+            }
+            catch
+            {
+                return BadRequest();
             }
 
         }
@@ -182,7 +189,8 @@ namespace LicentaBackEnd.Controllers
                     UserInfo = new BasicUserInfo
                     {
                         UserId = user.Id,
-                        UserName = user.UserName
+                        UserName = user.UserName,
+                        ImageURL = user.ProfilePicture
                     },
                     NumberOfComments = 0,
                     NumberOfLikes = 0,
@@ -249,7 +257,8 @@ namespace LicentaBackEnd.Controllers
                     UserInfo = new BasicUserInfo
                     {
                         UserId = user.Id,
-                        UserName = user.UserName
+                        UserName = user.UserName,
+                        ImageURL = user.ProfilePicture
                     },
                     NumberOfComments = 0,
                     NumberOfLikes = 0,
@@ -496,11 +505,11 @@ namespace LicentaBackEnd.Controllers
 
         [HttpGet]
         [Authorize]
-        [Route("repos/myRepo/{id}")]
-        public async Task<ActionResult<IEnumerable<Repository>>> GetMyRepo(Guid id)
+        [Route("repos/getReposByUserId/{id}")]
+        public async Task<ActionResult<IEnumerable<RepositoryResponse>>> GetReposByUserId(Guid id)
         {
-            string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            User user = await UserManager.FindByIdAsync(UserClaimId);
+            
+            User user = await UserManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
                 return BadRequest();
@@ -508,7 +517,17 @@ namespace LicentaBackEnd.Controllers
 
             try
             {
-               return  RepositoryService.GetMany(repo => repo.OwnerId == user.Id).ToList();
+               List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
+               IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
+                List<RepositoryResponse> repoResponses = repos.Select(repo => new RepositoryResponse() { Repository = repo }).ToList();
+
+                foreach( RepositoryResponse repoResponse in repoResponses)
+                {
+                    repoResponse.numberOfUsers = UserRepositoryService.GetMany(userRepo => userRepo.RepositoryId == repoResponse.Repository.Id).Count();
+                    repoResponse.numberOfPosts = RepositoryPostService.GetMany(postRepo => postRepo.RepositoryId == repoResponse.Repository.Id).Count();
+                    repoResponse.ImageURL = "";
+                }
+                return repoResponses;
             }
             catch
             {
@@ -516,6 +535,38 @@ namespace LicentaBackEnd.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("repos/getEditableReposByUserId/{userId}/{postId}")]
+        public async Task<ActionResult<IEnumerable<AddToRepoResponse>>> GetEditableReposByUserId(Guid userId,Guid postId)
+        {
+
+            User user = await UserManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id && !repo.Privileges.Equals(Privilages.ViewOnly)).Select(userRepos => userRepos.RepositoryId).ToList();
+                IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
+                List<AddToRepoResponse> repoResponses = repos.Select(repo => new AddToRepoResponse() { Repository = repo }).ToList();
+
+                foreach (AddToRepoResponse repoResponse in repoResponses)
+                {
+                    repoResponse.numberOfUsers = UserRepositoryService.GetMany(userRepo => userRepo.RepositoryId == repoResponse.Repository.Id).Count();
+                    repoResponse.numberOfPosts = RepositoryPostService.GetMany(postRepo => postRepo.RepositoryId == repoResponse.Repository.Id).Count();
+                    repoResponse.ImageURL = "";
+                    repoResponse.IsPostSavedInRepo = RepositoryPostService.GetMany(repoPost => repoPost.RepositoryId == repoResponse.Repository.Id && repoPost.PostId == postId).Count() > 0;
+                }
+                return repoResponses;
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
         [HttpPut]
         [Authorize]
@@ -563,6 +614,7 @@ namespace LicentaBackEnd.Controllers
                 body.Id = new Guid();
                 body.OwnerId = user.Id;
                 Repository repo = RepositoryService.Add(body);
+                UserRepositoryService.Add(new UserRepository() { Privileges = "Admin", RepositoryId = repo.Id, UserId = user.Id });
                 return repo;
             }
             catch
@@ -650,9 +702,9 @@ namespace LicentaBackEnd.Controllers
             }
 
             Repository repo = RepositoryService.GetById(repoId);
-            if (repo == null || repo.OwnerId != user.Id)
+            if (repo == null)
             {
-                return Forbid();
+                return BadRequest();
             }
 
             Post post = PostService.GetById(postId);
@@ -683,19 +735,61 @@ namespace LicentaBackEnd.Controllers
 
             EmailService.SendEmailConfirmationMail(email," ");
         }
-    
-        //[Authorize]
-        //public async override Task<UserDTO> Profile()
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        //    User user = await _userManager.FindByIdAsync(userId);
-        //    return new UserDTO
-        //    {
-        //        Email = user.Email,
-        //        UserName = user.UserName,
-        //        Id = user.Id.ToString()
-        //    };
 
-        //}
+        [Authorize]
+        [HttpGet]
+        [Route("/user/profile/get-profile")]
+        public async Task<ActionResult<UserProfileDTO>> GetProfile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User user = await UserManager.FindByIdAsync(userId);
+            
+            if(user == null)
+            {
+                return BadRequest();
+            }
+
+            List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
+            IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
+
+            return new UserProfileDTO()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Description = user.Description,
+                ImageURL = user.ProfilePicture,
+                NumberOfPosts = PostService.GetMany(post => post.UserId == user.Id).Count(),
+                NumberOfRepos = repos.Count(),
+
+            };
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/user/profile/get-profile-by-id")]
+        public async Task<ActionResult<UserProfileDTO>> GetProfileById( Guid userId)
+        {
+            User user = await UserManager.FindByIdAsync(userId.ToString());
+            if(user == null)
+            {
+                return BadRequest();
+            }
+
+            List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
+            IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
+
+            return new UserProfileDTO()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Description = user.Description,
+                ImageURL = user.ProfilePicture,
+                NumberOfPosts = PostService.GetMany(post => post.UserId == user.Id).Count(),
+                NumberOfRepos = repos.Count(),
+            };
+
+        }
+
     }
 }

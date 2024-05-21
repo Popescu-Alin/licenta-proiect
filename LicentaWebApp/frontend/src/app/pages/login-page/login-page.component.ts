@@ -27,7 +27,6 @@ export class LoginPageComponent implements OnInit {
               private customAlertSevcice: CustomAlertService) { }
 
   ngOnInit() {
-    this.router.navigate(['/mail-confirmation','mail','token']);
     this.initForm();
   }
 
@@ -45,6 +44,7 @@ export class LoginPageComponent implements OnInit {
       if(token && token.token && token.token.length > 0){
         if(token.confirmedEmail){
           this.dataReciver.setToken(token.token);
+          this.dataReciver.setUserData(token);
           this.customAlertSevcice.successSnackBar("Login successful!");
           this.router.navigate(['/home']);
           this.dataReciver.setIsLogedIn(true);
@@ -64,7 +64,7 @@ export class LoginPageComponent implements OnInit {
   }
 
   goToSignUpPage(){
-    this.router.navigate(['/sign-up']);
+    this.router.navigate(['/auth/sign-up']);
   }
 
   closeModal(){

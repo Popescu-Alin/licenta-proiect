@@ -1,13 +1,25 @@
 ﻿using LicentaBackEnd.DBContext;
+using LicentaBackEnd.DTOs;
 using LicentaBackEnd.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace LicentaBackEnd.Service
 {
     public class PostService : BaseService, IService<Post>
     {
-        public PostService(AppDBContext context) : base(context)
+        readonly UserService UserService;
+        readonly CommentService CommentService;
+        readonly LikeService LikeService;
+        readonly RepositoryPostService RepositoryPostService;
+        readonly UserRepositoryService UserRepositoryService;
+        public PostService(AppDBContext context, UserService userService, CommentService commentService, LikeService likeService, RepositoryPostService repositoryPostService, UserRepositoryService userRepositoryService) : base(context)
         {
+            UserService = userService;
+            CommentService = commentService;
+            LikeService = likeService;
+            RepositoryPostService = repositoryPostService;
+            UserRepositoryService = userRepositoryService;
         }
 
         public  Post Add(Post entity)
@@ -61,6 +73,33 @@ namespace LicentaBackEnd.Service
             _context.Posts.Remove(post);
             _context.SaveChanges();
             return true;
+        }
+
+        public List<PostResponse> getPostResponses(Func<Post, bool> condition,int take, int offset, Guid userIdOfTheCaller) {
+            List<Post> posts  = GetMany(condition).OrderByDescending(entity => entity.Id).Skip(offset).Take(take).ToList();
+
+            if(posts.Count() == 0) { 
+                return new  List<PostResponse>();
+            }
+
+            List<PostResponse> postResponses = posts.Join(_context.Users, post => post.UserId, user => user.Id, (post, user) => new PostResponse
+            {
+                Post = post,
+                UserInfo = new BasicUserInfo { UserId = user.Id, UserName = user.UserName, ImageURL = user.ProfilePicture}
+            }).ToList();
+
+            IQueryable<Guid> userReposGuids = UserRepositoryService.GetMany(entity => entity.UserId == userIdOfTheCaller).Select(entity => entity.RepositoryId);
+            IQueryable<RepositoryPost> repoPosts = RepositoryPostService.GetMany(entity => userReposGuids.Contains(entity.RepositoryId));
+
+            foreach (var postResponse in postResponses) {
+                postResponse.NumberOfComments = CommentService.GetMany(comment => comment.PostId == postResponse.Post.Id).Count();
+                postResponse.NumberOfLikes = LikeService.GetMany(like => like.PostId == postResponse.Post.Id).Count();
+                postResponse.IsLiked = LikeService.GetMany(like => like.PostId == postResponse.Post.Id && like.UserId == userIdOfTheCaller).Count() > 0;
+                postResponse.IsSaved = repoPosts.Where(entity => entity.PostId == postResponse.Post.Id).Count() > 0;
+            }
+
+            return postResponses;
+
         }
     }
 }

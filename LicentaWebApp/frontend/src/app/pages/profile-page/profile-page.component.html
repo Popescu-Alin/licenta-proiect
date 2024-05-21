@@ -1,19 +1,52 @@
-<!-- <div class="container-fluid">
-  <div class="container-fluid d-flex justify-content-center" *ngIf="isLoadingUser || isLoadingPosts">
-    <div class="loader black-loader h-50px w-50px"></div>
+<div class="container-fluid page-content p-0 m-0">
+  <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoadingUser ">
+    <div class="circle-ripple"></div>
   </div>
-  <div *ngIf="!isLoadingPosts && !isLoadingUser" >
-    <div class="container-fluid d-flex flex-column">
-      <div class="d-flex flex-column">
-        <h5>{{userData?.email}}</h5>
-        <h5>{{userData?.userName}}</h5>
-      </div>
-      <div class="container-fluid d-flex flex-row justify-content-around flex-wrap overflow-auto height-85vh">
-        <div class="col-3 m-2" *ngFor="let postResponse of postResponses">
-          <app-post [postResponse]="postResponse">
-          </app-post>
-        </div>
-      </div>
+  <div *ngIf="!isLoadingUser">
+
+    <div class="profile-container full-width d-flex flex-column justify-content-center mt-1 pt-1" *ngIf="userData">
+      <img *ngIf="userData.imageURL" [src]="userData.imageURL" alt="profile image"
+        class="avatar align-self-center pt-1" />
+      <img *ngIf="!userData.imageURL" src="../../../assets/default-images/user-image.png" alt="profile image"
+        class="avatar  align-self-center pt-1" />
+      <span class="fs-3 text-color-black">{{userData.userName}}</span>
+      <span class="fs-5">Posts {{userData.numberOfPosts}} | Repos {{userData.numberOfRepos}}</span>
     </div>
 
-  </div> -->
+    <div class="full-width  d-flex flex-row justify-content-around py-1 px-1">
+      <div class="clickable full-width d-flex flex-column" [ngClass]="{'underline': isPostListShown}"
+        (click)="selectPosts()"> <span class="align-self-center">Posts</span>
+      </div>
+      <div class="clickable full-width d-flex flex-column" [ngClass]="{'underline': !isPostListShown}"
+        (click)="selectRepositories()"><span class="align-self-center">Repos</span>
+      </div>
+    </div>
+    <div class="custom-height">
+      <ng-container *ngIf="isPostListShown; else showRepos">
+        <ng-container *ngIf="isLoadingPosts; else postLoaded">
+          <div class="full-width full-height d-flex justify-content-center align-items-center">
+            <div class="circle-ripple"></div>
+          </div>
+        </ng-container>
+        <ng-template #postLoaded>
+          <div *ngIf="postResponses">
+            <app-posts-list class="custom-height d-flex flex-column" [list]="postResponses"></app-posts-list>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-template #showRepos>
+        <ng-container *ngIf="isLoadingRepos; else reposLoaded">
+          <div class="full-width full-height d-flex justify-content-center align-items-center">
+            <div class="circle-ripple"></div>
+          </div>
+        </ng-container>
+        <ng-template #reposLoaded>
+          <div *ngIf="reposResponses">
+            <app-repos-list class="custom-height d-flex flex-column"
+              [repositorysResponses]="reposResponses"></app-repos-list>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+  </div>
+</div>

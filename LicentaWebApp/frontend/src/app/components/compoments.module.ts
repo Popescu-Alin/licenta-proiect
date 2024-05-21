@@ -7,11 +7,17 @@ import { AddPostModalComponent } from './add-post-modal/add-post-modal.component
 import { ReactiveFormsModule } from '@angular/forms';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { EmailNotConfirmedModalComponent } from './email-not-confirmed-modal/email-not-confirmed-modal.component';
-
+import { PostsListComponent } from './posts-list/posts-list.component';
+import { RepoComponent } from './repo/repo.component';
+import { ReposListComponent } from './repos-list/repos-list.component';
+import { AddRepoModalComponent } from './add-repo-modal/add-repo-modal.component';
+import { SavePostPanelComponent } from './save-post-panel/save-post-panel.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbModule,
   ],
   declarations: [
     PostComponent,
@@ -20,6 +26,11 @@ import { EmailNotConfirmedModalComponent } from './email-not-confirmed-modal/ema
     AddPostModalComponent,
     NavBarComponent,
     EmailNotConfirmedModalComponent,
+    PostsListComponent,
+    RepoComponent,
+    ReposListComponent,
+    AddRepoModalComponent,
+    SavePostPanelComponent,
   ],
   exports: [
     PostComponent,
@@ -28,6 +39,11 @@ import { EmailNotConfirmedModalComponent } from './email-not-confirmed-modal/ema
     AddPostModalComponent,
     NavBarComponent,
     EmailNotConfirmedModalComponent,
+    PostsListComponent,
+    RepoComponent,
+    ReposListComponent,
+    AddRepoModalComponent,
+    SavePostPanelComponent,
   ]
 })
 export class ComponentsModule { }

@@ -24,7 +24,7 @@ export class NavBarComponent implements OnInit {
 
   logOut() {
     this.dataRecever.clearServiceData();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
     this.dataRecever.setIsLogedIn(false);
   }
 

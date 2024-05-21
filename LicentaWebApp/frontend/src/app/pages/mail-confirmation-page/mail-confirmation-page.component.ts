@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { CustomAlertService } from '../../services/custom-alert.service';
 
 @Component({
   selector: 'app-mail-confirmation-page',
@@ -7,9 +10,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MailConfirmationPageComponent implements OnInit {
 
-  constructor() { }
+  isLoading = true;
+  constructor(private route: ActivatedRoute,
+              private router: Router, 
+              private authService: AuthService,
+              private alertService: CustomAlertService) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.isLoading = true;
+    console.log("Mail confirmation page");
+    let email: string | null = this.route.snapshot.paramMap.get('email');
+    let token: string | null = this.route.snapshot.paramMap.get('token');
+    try{
+      await this.authService.confirmEmail(email? email : "", token? token : "");
+      this.router.navigate(['/auth/login']);
+    }
+    catch(e){
+      this.alertService.errorSnackBar("Email confirmation failed! Please check the link!");
+    }finally{
+      this.isLoading = false;
+    }
   }
 
 }

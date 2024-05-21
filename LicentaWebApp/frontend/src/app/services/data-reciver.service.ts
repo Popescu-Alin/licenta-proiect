@@ -1,5 +1,7 @@
+import { Token } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LogInTokenRepsone } from '../client/client';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,6 @@ export class DataReciverService {
   private isLogedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isLogedIn$: Observable<boolean> = this.isLogedInSubject.asObservable();
 
-  
   setIsLogedIn(value: boolean): void {
     this.isLogedInSubject.next(value);
   }
@@ -20,18 +21,18 @@ export class DataReciverService {
   getIsLogedIn(): Observable<boolean> {
     return this.isLogedIn$;
   }
-  // setUserData(User: LoginResponse) {
-  //   if (typeof sessionStorage !== 'undefined') {
-  //     sessionStorage.setItem('user', JSON.stringify(User));
-  //   }
-  // }
+  setUserData(User: LogInTokenRepsone) {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('user', JSON.stringify(User));
+    }
+  }
 
-  // getUserData(): LoginResponse | undefined {
-  //   if (typeof sessionStorage !== 'undefined') {
-  //     return JSON.parse(sessionStorage.getItem('user')!) ?? undefined;
-  //   }
-  //   return undefined;
-  // }
+  getUserData(): LogInTokenRepsone | undefined {
+    if (typeof sessionStorage !== 'undefined') {
+      return JSON.parse(sessionStorage.getItem('user')!) ?? undefined;
+    }
+    return undefined;
+  }
 
   setToken(token: string) {
     if (typeof sessionStorage !== 'undefined') {
@@ -42,6 +43,19 @@ export class DataReciverService {
   getToken(): string | undefined {
     if (typeof sessionStorage !== 'undefined') {
       return sessionStorage.getItem('token') ?? undefined;
+    }
+    return undefined;
+  }
+
+  setApplicationUserId(userId: string) {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('applicationUserId', userId);
+    }
+  }
+
+  getApplicationUserId(): string | undefined {
+    if (typeof sessionStorage !== 'undefined') {
+      return sessionStorage.getItem('applicationUserId') ?? undefined;
     }
     return undefined;
   }

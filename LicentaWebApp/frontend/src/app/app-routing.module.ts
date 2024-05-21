@@ -8,12 +8,12 @@ import { ProfilePageComponent } from './pages/profile-page/profile-page.componen
 import { MailConfirmationPageComponent } from './pages/mail-confirmation-page/mail-confirmation-page.component';
 
 export const routes: Routes = [
-    { path: 'login', component: LoginPageComponent },
-    { path: 'sign-up', component: SignUpPageComponent },
-    { path: 'mail-confirmation/:mail/:token',component: MailConfirmationPageComponent},
+    { path: 'auth/login', component: LoginPageComponent },
+    { path: 'auth/sign-up', component: SignUpPageComponent },
+    { path: 'auth/mail-confirmation/:email/:token',component: MailConfirmationPageComponent},
     { path: 'home', component: MainPageComponent, canActivate: [AuthGuard]},
     { path: 'profile', component: ProfilePageComponent, canActivate: [AuthGuard]},
-    { path: '', redirectTo: '/login', pathMatch: 'full'}
+    { path: '', redirectTo: '/auth/login', pathMatch: 'full'}
 
 ];
 @NgModule({

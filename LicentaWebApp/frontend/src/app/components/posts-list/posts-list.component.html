@@ -1,0 +1,16 @@
+
+<div class="overflow-auto full-height full-width ">
+  <div class="d-flex flex-column full-height justify-content-center">
+  <ng-container *ngIf="postList.length > 0; else noPosts">
+    <ng-container *ngFor="let post of postList">
+      <app-post class="align-self-center" [postResponse]="post"></app-post>
+    </ng-container>
+  </ng-container>
+  
+  <ng-template #noPosts>
+    <div class=" full-width align-self-center d-flex justify-content-center">
+      <span class="fs-3 text-color-black ">No posts to show</span>
+    </div>
+  </ng-template>
+  </div>
+</div>

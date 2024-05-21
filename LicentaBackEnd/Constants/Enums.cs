@@ -11,4 +11,11 @@
         public static string User = "User";
         public static string Admin = "Admin";
     }
+
+    public static class Privilages
+    {
+        public static string Admin = "Admin";
+        public static string ViewOnly = "View only";
+        public static string Editor = "Editor";
+    }
 }

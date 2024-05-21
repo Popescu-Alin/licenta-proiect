@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { PostResponse } from '../../client/client';
+import { LikeDislikeService } from '../../services/like-dislike.service';
 
 @Component({
   selector: 'app-post',
@@ -9,11 +10,55 @@ import { PostResponse } from '../../client/client';
 export class PostComponent implements OnInit {
 
   @Input() postResponse: PostResponse | undefined;
+  savePanelOpen: boolean = false;
 
-  constructor() { }
+  constructor( private likeDislikeService: LikeDislikeService,
+                private changeDdtectorRef: ChangeDetectorRef
+  ) { }
 
-  ngOnInit() {
+  ngOnInit() {  
   }
+
+  async likeDislikePost() {
+    if (!this.postResponse) {
+      return;
+    }
+    if(this.postResponse.isLiked){
+      this.postResponse.isLiked! = false;
+      this.postResponse.numberOfLikes! -= 1;
+      try{
+        await this.likeDislikeService.dislikePost(this.postResponse.post!.id!);
+      }
+      catch (e) {
+        this.postResponse.isLiked! = true;
+        this.postResponse.numberOfLikes! += 1;
+      }
+    } else {
+      this.postResponse.isLiked! = true;
+      this.postResponse.numberOfLikes! += 1;
+      try{
+        await this.likeDislikeService.likePost(this.postResponse.post!.id!);
+      }
+      catch (e) {
+        this.postResponse.isLiked! = false;
+        this.postResponse.numberOfLikes! -= 1;
+      }
+    }
+    this.changeDdtectorRef.detectChanges();
+  }
+
+  openSavePanel() {
+    this.savePanelOpen = true;
+  }
+
+  closeSavePanel() {
+    this.savePanelOpen = false;
+  }
+
+  updateSaveStatus( status: boolean) {
+    this.postResponse!.isSaved = status;
+  }
+
 
 
 }

@@ -1,0 +1,33 @@
+.rounded-image{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    border: solid 1px transparent;
+}
+
+
+
+.profile-container {
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.text-color-black {
+    color: #000000;
+}
+
+.underline {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.custom-height {
+    height: calc(100dvh - 365px);
+}

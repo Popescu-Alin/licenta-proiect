@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-footer',
@@ -7,9 +10,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FooterComponent implements OnInit {
 
-  constructor() { }
+  pageNavigationSubscriptio: Subscription = new Subscription();
+  isAuthPage: boolean = false;
+  constructor(private router: Router) { }
 
   ngOnInit() {
+    this.pageNavigationSubscriptio = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isAuthPage = event.url.includes('auth/');
+      }
+    });
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
+  }
+
+  ngOnDestroy(): void {
+    this.pageNavigationSubscriptio.unsubscribe();
   }
 
 }

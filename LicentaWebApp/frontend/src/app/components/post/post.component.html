@@ -1,12 +1,35 @@
-<div class="card mb-3">
-  <h3 class="card-header">{{postResponse!.userInfo?.userName}}</h3>
-  
-  <img src={{postResponse?.post?.url}} class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image " focusable="false"/>
+<div class="card mb-3 w-500" *ngIf="postResponse">
+  <div class="card-header d-flex justify-content-between ">
+    <span>
+      <a href="/profile/{{postResponse.userInfo?.userName}}" class="text-decoration-none">
+        <img src="" class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+        <span class="text-muted">{{postResponse!.userInfo?.userName}}</span>
+      </a>
+    </span>
+    <span class="text-muted align-self-center">{{postResponse!.post?.createdDate | date:'short'}}</span>
+  </div>
+
+  <img src={{postResponse.post?.url}} class="d-block user-select-none" width="100%" height="200"
+    aria-label="Placeholder: Image " focusable="false" />
   <div class="card-body">
-    <p class="card-text">{{postResponse!.post?.content}}</p>
+    <p class="card-text">{{postResponse.post?.content}}</p>
   </div>
 
   <div class="card-footer text-muted">
-    {{postResponse!.post?.createdDate | date:'short'}}
+    <div class="d-flex justify-content-between">
+
+      <span>{{postResponse.numberOfLikes}}
+        <em class="clickable pi " (click)="likeDislikePost()"
+          [ngClass]="{'isLiked pi-thumbs-up-fill ': postResponse.isLiked, 'pi-thumbs-up': !postResponse.isLiked}"></em>
+      </span>
+
+      <span>{{postResponse.numberOfComments}} {{ postResponse.numberOfComments == 1 ? 'comment':'comments'}}</span>
+
+      <em class="clickable pi" (click)="openSavePanel()"
+        [ngClass]="{'pi-bookmark-fill': postResponse.isSaved, 'pi-bookmark': !postResponse.isSaved}"></em>
+
+    </div>
   </div>
+  <app-save-post-panel *ngIf="savePanelOpen" [isModalOpen]="savePanelOpen" (closeModalEmitter)="closeSavePanel()" (responseEmitter)="updateSaveStatus($event)" [postId]="postResponse.post!.id!"></app-save-post-panel>
+
 </div>

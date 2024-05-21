@@ -4,3 +4,8 @@ export enum Roles {
     Admin = "Admin",
     User = "User"
 }
+
+export enum AccessModifiers {
+    Public = "Public",
+    Private = "Private"
+}

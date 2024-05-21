@@ -1,0 +1,18 @@
+<div class="full-height">
+
+  <ng-container *ngIf="repositorysResponses && repositorysResponses.length>0; else noRepos">
+    <div *ngFor="let repo of repositorysResponses">
+      <app-repo [repositoryResponse]="repo"></app-repo>
+    </div>
+  </ng-container>
+  
+  <ng-template #noRepos>
+    <div class="full-width full-height d-flex flex-column  justify-content-center align-items-center">
+      <span class="fs-3 text-color-black">No repositories</span>
+      <span class="btn btn-link" (click)="openModal()">Add a repository?</span>
+    </div>
+    <app-add-repo-modal [isModalOpen]="isModalOpen" (closeModalEmitter)="closeModal()" (repositoryEmitter)="repositoryEmitter($event)"></app-add-repo-modal>
+  </ng-template>
+  
+
+</div>

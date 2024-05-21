@@ -21,7 +21,7 @@ namespace LicentaBackEnd.Service
                 mailMessage.From = new MailAddress(emailFrom);
                 mailMessage.To.Add(userEmail);
                 mailMessage.Subject = "EmailConfimation";
-                mailMessage.Body = $"Confirm by clicking the link below <a href=\"https://localhost:7242/api/Base/confirm-email?email={userEmail}&token={token}\">link</a>";
+                mailMessage.Body = $"Confirm by clicking the link below <a href=\"http://localhost:4200/mail-confirmation/{userEmail}/{token}\">link</a>";
                 mailMessage.IsBodyHtml = true;
 
                 SmtpClient smtpClient = new SmtpClient();

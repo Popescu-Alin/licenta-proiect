@@ -12,14 +12,22 @@ export class PostService {
     private client: Client
   ) {}
 
-  getPosts(take: number, skip: number): Observable<PostResponse[]> {
+  getPosts(take: number, skip: number): Promise<PostResponse[] | undefined> {
     this.client.setAuthToken(this.dataReciver.getToken()!);
-    return this.client.getPosts(take,skip);
+    return this.client.getPosts(take, skip).toPromise();
+  }
+
+  getPostsByUserId(
+    take: number,
+    skip: number,
+    userID: string
+  ): Promise<PostResponse[] | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getPostsByUsreId(take, skip, userID).toPromise();
   }
 
   addPost(post: Post): Observable<PostResponse> {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.addPost(post);
   }
-
 }

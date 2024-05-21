@@ -43,7 +43,7 @@ namespace LicentaBackEnd.Service
 
         public RepositoryPost GetByConition(Func<RepositoryPost, bool> condition)
         {
-            return _context.RepositoryPosts.Find(condition);
+            return _context.RepositoryPosts.Where(condition).FirstOrDefault();
         }
 
         public IQueryable<RepositoryPost> GetMany(Func<RepositoryPost, bool>? condition)

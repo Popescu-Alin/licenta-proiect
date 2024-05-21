@@ -7,10 +7,7 @@ namespace LicentaBackEnd.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string ProfilePicture { get; set; }
-        public string EmailConfirmationToken { get; set; }
-        public DateTime ExpirationDateEmailConfirmationToken { get; set; }
-        public string ForgottenPasswordToken { get; set; }
-        public DateTime ExpirationDateForgottenPasswordToken { get; set; }
+        public string Description { get; set; } 
         public User() : base() { }
     }
 }

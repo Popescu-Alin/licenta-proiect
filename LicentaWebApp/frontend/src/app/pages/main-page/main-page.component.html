@@ -1,17 +1,11 @@
-<div class="container-fluid" >
-  <div class="container-fluid d-flex justify-content-center" *ngIf="isLoading">
-    <div class="loader black-loader h-50px w-50px"></div>
+<div class="container-fluid page-content" >
+  <div class="full-width full-height d-flex justify-content-center align-items-center"*ngIf="isLoading">
+    <div class="circle-ripple"></div>
   </div>
-  <div *ngIf="!isLoading" class="container-fluid d-flex flex-row justify-content-around flex-wrap overflow-auto height-85vh">
-    <div class="col-3 m-2" *ngFor="let postResponse of postResponses">
-      <app-post [postResponse]="postResponse">
-      </app-post>
-    </div>
+  <div *ngIf="!isLoading" class="container-fluid d-flex flex-row justify-content-around flex-wrap overflow-auto ">
+    <app-posts-list [list]="postResponses!">
+    </app-posts-list>
   </div>
 
-  <button class="btn btn-primary sticky-button-bottom-right" (click)="openModal()">Add Post</button>
 </div>
-<app-add-post-modal [isModalOpen]="isModalOpen" (postResponseEmitter)="addToTheList($event)"
-  (closeModalEmitter)="closeModal()">
-</app-add-post-modal>
-<app-footer></app-footer>
+

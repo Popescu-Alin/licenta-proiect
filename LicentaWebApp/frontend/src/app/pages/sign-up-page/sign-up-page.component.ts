@@ -60,7 +60,7 @@ export class SignUpPageComponent implements OnInit {
             this.customAlertService.successSnackBarNotAutoClose(
               'A confiremation email has been sent to your email address. Please confirm your email to login.'
             );
-            this.router.navigate(['/login']);
+            this.router.navigate(['/auth/login']);
           
         },
         error: (error) => {

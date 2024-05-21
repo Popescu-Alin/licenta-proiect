@@ -1,0 +1,43 @@
+<app-modal [isOpen]="isModalOpen" [title]="''" (closeModalEmitter)="closeModalEmitter.emit()">
+
+    <ng-container *ngIf="isLoading; else dataLoaded">
+        <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoading">
+            <div class="circle-ripple"></div>
+        </div>
+    </ng-container>
+    <ng-template #dataLoaded>
+        <ng-container *ngIf="addToRepoResponses && addToRepoResponses.length > 0; else noData">
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center " >
+                    <div *ngFor="let repo of addToRepoResponses">
+                        <div class="card mb-3 square-240px" >
+                            <div class="card-header d-flex justify-content-between ">
+                                <span>
+                                    {{repo.repository!.title}}
+                                </span>
+                                <span class="text-muted align-self-center pi "
+                                    [ngClass]="{'pi-globe': repo.repository!.accessModifier == accessModifiers.Public, 'pi-lock':repo.repository!.accessModifier == accessModifiers.Private}"></span>
+                            </div>
+                            <img src="" class="d-block user-select-none" width="100%" height="200"
+                                aria-label="Placeholder: Image " focusable="false" />
+                            <div class="card-footer text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span class="pi pi-users">{{repo.numberOfUsers}}</span>
+                                    <span class="clickable pi pi-plus-circle p-0" *ngIf="!repo.isPostSavedInRepo" (click)="addToRepo(repo.repository?.id!)"></span>
+                                    <span class="clickable pi pi-minus-circle p-0" *ngIf="repo.isPostSavedInRepo" (click)="removeFromRepo(repo.repository?.id!)"></span>
+                                    <span class="pi pi-file-o">{{repo.numberOfPosts}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #noData></ng-template>
+
+    </ng-template>
+
+
+
+</app-modal>

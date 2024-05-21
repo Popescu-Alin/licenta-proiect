@@ -20,4 +20,8 @@ export class AuthService {
   sendConfirmationEmail(email: string): Promise<void> {
     return this.client.resendConfirmationEmail(email).toPromise();
   }
+  
+  confirmEmail(email: string, token: string): Promise<void> {
+    return this.client.confirmEmail(email, token).toPromise();
+  }
 }

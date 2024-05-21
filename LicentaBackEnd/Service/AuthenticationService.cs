@@ -27,6 +27,9 @@ namespace LicentaBackEnd.Service
                 return new LogInTokenRepsone() {
                     ConfirmedEmail = false,
                     Token = null,
+                    ImageURL = "",
+                    UserName = "",
+                    UserId = "",
                 };
             }
             if (!_userManager.CheckPasswordAsync(userEntity,password).Result)
@@ -35,6 +38,9 @@ namespace LicentaBackEnd.Service
                 {
                     ConfirmedEmail = false,
                     Token = null,
+                    ImageURL = "",
+                    UserName ="",
+                    UserId = "",
                 };
             }
             IEnumerable<string> roles = _userManager.GetRolesAsync(userEntity).Result;
@@ -44,6 +50,9 @@ namespace LicentaBackEnd.Service
             {
                 ConfirmedEmail = userEntity.EmailConfirmed,
                 Token = tokenHandler.WriteToken(token),
+                ImageURL = userEntity.ProfilePicture,
+                UserName = userEntity.UserName,
+                UserId = userEntity.Id.ToString(),
             };    
         }
     
@@ -61,10 +70,7 @@ namespace LicentaBackEnd.Service
                 UserName = entity.UserName,
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
-                EmailConfirmationToken = Guid.NewGuid().ToString(),
                 EmailConfirmed = false,
-                ExpirationDateEmailConfirmationToken = DateTime.UtcNow.AddHours(24),
-                ForgottenPasswordToken = "",
                 ProfilePicture = ""
             };
             IdentityResult result = _userManager.CreateAsync(user, entity.Password).Result;

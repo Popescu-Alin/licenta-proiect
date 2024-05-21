@@ -43,7 +43,7 @@ namespace LicentaBackEnd.Service
 
         public Like GetByConition(Func<Like, bool> condition)
         {
-            return _context.Likes.Find(condition);
+            return _context.Likes.Where(condition).FirstOrDefault();
         }
 
         public IQueryable<Like> GetMany(Func<Like, bool>? condition)
