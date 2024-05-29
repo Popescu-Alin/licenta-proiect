@@ -30,4 +30,9 @@ export class PostService {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.addPost(post);
   }
+
+  getPost(postId: string): Promise<PostResponse | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getPostById(postId).toPromise();
+  }
 }

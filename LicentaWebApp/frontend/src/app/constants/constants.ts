@@ -9,3 +9,10 @@ export enum AccessModifiers {
     Public = "Public",
     Private = "Private"
 }
+
+export enum Privilages
+{
+    Admin = "Admin",
+    ViewOnly = "View only",
+    Editor = "Editor",
+}

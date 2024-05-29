@@ -33,9 +33,9 @@ namespace LicentaBackEnd.Service
         {
             if(condition != null)
             {
-                return _context.Users.Where(condition).AsQueryable().AsNoTracking();
+                return _context.Users.AsNoTracking().Where(condition).AsQueryable();
             }
-            return _context.Users.AsQueryable().AsNoTracking();
+            return _context.Users.AsNoTracking().AsQueryable();
         }
 
         public User GetByConition(Func<User, bool> condition)

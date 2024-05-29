@@ -22,6 +22,7 @@ export class DataReciverService {
     return this.isLogedIn$;
   }
   setUserData(User: LogInTokenRepsone) {
+    this.setApplicationUserId(User.userId!);
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('user', JSON.stringify(User));
     }

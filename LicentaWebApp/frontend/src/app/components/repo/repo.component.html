@@ -16,9 +16,12 @@
       focusable="false" />
     <div class="card-footer text-muted">
       <div class="d-flex justify-content-between">
-        <span class="pi pi-users">{{repositoryResponse.numberOfUsers}}</span>
+        <span class="pi pi-users clickable" (click)="openModal()">{{repositoryResponse.numberOfUsers}}</span>
         <span class="pi pi-file-o">{{repositoryResponse.numberOfPosts}}</span>
       </div>
     </div>
   </div>
+  <app-list-edit-repo-users *ngIf="isModalOpen" [ownerId]="repositoryResponse.repository?.ownerId!" (closeModalEmitter)="closeModal()" [isModalOpen]="isModalOpen" [repoId]="repositoryResponse.repository!.id!"
+  (userNumberUpdateEmitter) = "updateUserNumber($event)"></app-list-edit-repo-users>
+
 </div>

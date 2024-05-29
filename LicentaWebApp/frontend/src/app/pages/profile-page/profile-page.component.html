@@ -5,10 +5,13 @@
   <div *ngIf="!isLoadingUser">
 
     <div class="profile-container full-width d-flex flex-column justify-content-center mt-1 pt-1" *ngIf="userData">
-      <img *ngIf="userData.imageURL" [src]="userData.imageURL" alt="profile image"
-        class="avatar align-self-center pt-1" />
-      <img *ngIf="!userData.imageURL" src="../../../assets/default-images/user-image.png" alt="profile image"
-        class="avatar  align-self-center pt-1" />
+      <div>
+        <label for="image-upload" class="clickable" *ngIf="appUserId == userId">
+        <img *ngIf="userData.imageURL" [src]="userData.imageURL" alt="profile image"
+          class="avatar align-self-center pt-1" />
+        <img *ngIf="!userData.imageURL" src="../../../assets/default-images/user-image.png" alt="profile image"
+          class="avatar  align-self-center pt-1" /></label> 
+      </div>
       <span class="fs-3 text-color-black">{{userData.userName}}</span>
       <span class="fs-5">Posts {{userData.numberOfPosts}} | Repos {{userData.numberOfRepos}}</span>
     </div>
@@ -42,7 +45,7 @@
         </ng-container>
         <ng-template #reposLoaded>
           <div *ngIf="reposResponses">
-            <app-repos-list class="custom-height d-flex flex-column"
+            <app-repos-list class="custom-height d-flex flex-column overflow-auto"
               [repositorysResponses]="reposResponses"></app-repos-list>
           </div>
         </ng-template>
@@ -50,3 +53,4 @@
     </div>
   </div>
 </div>
+

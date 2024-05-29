@@ -2,9 +2,12 @@ import { Injectable } from '@angular/core';
 import { DataReciverService } from './data-reciver.service';
 import {
   AddToRepoResponse,
+  BasicUserInfo,
   Client,
+  RepoUserBasicInfo,
   Repository,
   RepositoryResponse,
+  UserRepository,
 } from '../client/client';
 
 @Injectable({
@@ -46,4 +49,25 @@ export class RepoService {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.removePostFromRepo(repoId, postId).toPromise();
   }
+
+  getRepoUsers(repoId: string): Promise<RepoUserBasicInfo[] | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getUserRepos(repoId).toPromise();
+  }
+
+  addRepoUser(body: UserRepository): Promise<boolean | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.addUserToRepo(body).toPromise();
+  }
+
+  removeRepoUser(repoId: string, userId: string): Promise<boolean | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.deleteUserRepo(userId,repoId).toPromise();
+  }
+
+  updateRepoUser(userRepo:UserRepository): Promise<boolean | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.updateUserRepo(userRepo).toPromise();
+  }
+
 }

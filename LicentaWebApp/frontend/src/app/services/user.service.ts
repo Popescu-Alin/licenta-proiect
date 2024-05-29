@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DataReciverService } from './data-reciver.service';
-import { Client, UserProfileDTO } from '../client/client';
-import { Observable, of } from 'rxjs';
+import { BasicUserInfo, Client, UserProfileDTO } from '../client/client';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +12,13 @@ export class UserService {
     private client: Client
   ) {}
 
-  getUserProfile(): Promise<UserProfileDTO | undefined >{
+  getUserProfile(id: string): Promise<UserProfileDTO | undefined >{
     this.client.setAuthToken(this.dataReciver.getToken()!);
-    return this.client.getProfile().toPromise();
+    return this.client.getProfileById(id).toPromise();
+  }
+
+  searchForUser(searchString: string): Promise<BasicUserInfo[] | undefined>{
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.searchUser(searchString).toPromise();
   }
 }

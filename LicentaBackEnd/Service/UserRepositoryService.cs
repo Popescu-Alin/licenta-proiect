@@ -1,6 +1,9 @@
 ﻿using LicentaBackEnd.DBContext;
+using LicentaBackEnd.DTOs;
 using LicentaBackEnd.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Ocsp;
 
 namespace LicentaBackEnd.Service
 {
@@ -43,16 +46,16 @@ namespace LicentaBackEnd.Service
 
         public UserRepository GetByConition(Func<UserRepository, bool> condition)
         {
-            return _context.UserRepositories.Find(condition);
+            return _context.UserRepositories.Where(condition).FirstOrDefault();
         }
 
         public IQueryable<UserRepository> GetMany(Func<UserRepository, bool>? condition)
         {
             if(condition == null)
             {
-                return _context.UserRepositories.AsQueryable().AsNoTracking();  
+                return _context.UserRepositories.AsNoTracking().AsQueryable();  
             }
-            return _context.UserRepositories.Where(condition).AsQueryable().AsNoTracking();
+            return _context.UserRepositories.AsNoTracking().Where(condition).AsQueryable();
         }
 
         public UserRepository Update(UserRepository entity)
@@ -64,6 +67,18 @@ namespace LicentaBackEnd.Service
             repositoryPost.Privileges = entity.Privileges;
             _context.SaveChanges();
             return repositoryPost;
+        }
+        
+        public List<RepoUserBasicInfo> GetUserOfRepo(Guid repoId)
+        {
+            IQueryable<UserRepository> userRepos = _context.UserRepositories.Where(userRepo => userRepo.RepositoryId == repoId);
+            IQueryable<User> users = _context.Users;
+
+            IQueryable<RepoUserBasicInfo> repoUserBasicInfos = userRepos.Join(users,
+                                       userRepo => userRepo.UserId,
+                                       user => user.Id,
+                                       (userRepo, user) => new RepoUserBasicInfo() { UserID = user.Id,UserName = user.UserName, ImageURL = user.ProfilePicture, UserPrivileges = userRepo.Privileges });
+            return repoUserBasicInfos.AsNoTracking().ToList();
         }
     }
 }

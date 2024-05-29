@@ -1,0 +1,62 @@
+<app-modal [isOpen]="isModalOpen" [title]="''" (closeModalEmitter)="closeModalEmitter.emit()">
+  <div class="min-w-600 h-400 container-fluid">
+    <ng-container *ngIf="isLoading; else dataLoaded">
+      <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoading">
+        <div class="circle-ripple"></div>
+      </div>
+    </ng-container>
+    <ng-template #dataLoaded>
+      <ng-container *ngIf="repoUserBasicInfos && repoUserBasicInfos.length > 0; else noData">
+        <div class="table" >
+          <div class="d-flex flex-row " *ngIf="!isAddUserMenuOpen">
+            <div class="w-40 m-20 d-flex"><span class="pi-plus-circle pi align-self-center clickable"
+                (click)="openCloseAddUserMenu()"></span></div>
+            <div class="w-300 m-20 d-flex"><span>User name</span></div>
+            <div class="w-100px m-20 d-flex"><span>Privileges</span></div>
+            <div class="w-100px m-20 d-flex" *ngIf="isOwner"><span>Actions</span></div>
+          </div>
+
+          <div class="d-flex flex-row " *ngIf="isAddUserMenuOpen">
+            <div class="w-40 m-20 d-flex"><span class="pi-angle-left pi align-self-center clickable"
+                (click)="openCloseAddUserMenu()"></span></div>
+          </div>
+
+          <div *ngIf="!isAddUserMenuOpen" class="h-300px overflow-auto" >
+            <div class="table-secondary " *ngFor="let user of repoUserBasicInfos">
+              <app-show-edit-delete-repo-user [user]="user" class="p-0" [repoId]="repoId" (removedUserIdEmitter)="removeUser($event)"
+                [canEdit]="isOwner && user.userPrivileges != privileges.Admin"></app-show-edit-delete-repo-user>
+            </div>
+          </div>
+          <div *ngIf="isAddUserMenuOpen" class="d-flex flex-column justify-content-center">
+            <div class="align-self-center d-flex">
+              <input type="text" class="search-input" #inputValue>
+              <span class="pi pi-search clickable ps-1 align-items-center" (click)="search(inputValue.value)"></span>
+            </div>
+            <div class="overflow-auto h-250px">
+              <ng-container *ngFor="let user of userBasicInfos; let i = index">
+                <div class="d-flex">
+                  <div class="m-20 w-40">
+                    <img class="rounded-circle" src="{{user.imageURL}}" width="30" height="30"
+                      aria-label="Placeholder: Image " focusable="false" />
+                    {{user.imageURL}}
+                  </div>
+                  <div class="m-20 w-300">
+                    {{user.userName}}
+                  </div>
+                  <div class="d-block align-content-center">
+                    <span class="btn btn-sm btn-outline-info" (click)="addUserToRepo(user!)" *ngIf="!isAlreadyAdded[i]"> Add user</span>
+                    <span class="badge rounded-pill bg-info"  *ngIf="isAlreadyAdded[i]"> Already added</span>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <ng-template #noData></ng-template>
+
+    </ng-template>
+  </div>
+</app-modal>

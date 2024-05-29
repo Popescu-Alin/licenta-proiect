@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnInit } from '@angular/core';
 import {
   PostResponse,
   RepositoryResponse,
@@ -9,13 +9,15 @@ import { PostService } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
 import { CustomAlertService } from '../../services/custom-alert.service';
 import { RepoService } from '../../services/repo.service';
+import { ActivatedRoute } from '@angular/router';
+import { DataReciverService } from '../../services/data-reciver.service';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss'],
 })
-export class ProfilePageComponent implements OnInit {
+export class ProfilePageComponent {
   postResponses: PostResponse[] | undefined;
   reposResponses: RepositoryResponse[] | undefined;
 
@@ -24,24 +26,37 @@ export class ProfilePageComponent implements OnInit {
   isLoadingUser = false;
   isPostListShown = true;
   isLoadingRepos = false;
+  userId: string | null = null;
+  pathSubscription: Subscription | undefined;
+  appUserId: string | undefined;
 
   constructor(
     private postService: PostService,
     private alertService: CustomAlertService,
     private userService: UserService,
     private changesDetectRef: ChangeDetectorRef,
-    private repoService: RepoService
+    private repoService: RepoService,
+    private route: ActivatedRoute,
+    private dataReciver: DataReciverService,
   ) {}
 
-  ngOnInit() {
+
+  ngOnInit(): void {
+    this.appUserId = this.dataReciver.getApplicationUserId();
+    this.pathSubscription = this.route.paramMap.subscribe(params => {
+      this.userId = this.route.snapshot.paramMap.get('id');
     this.loadUserData();
+    this.loadPosts();
+    });
   }
 
   async loadUserData() {
+    if(!this.userId){
+      return;
+    }
     this.isLoadingUser = true;
     try {
-      this.userData = await this.userService.getUserProfile();
-      this.loadPosts();
+      this.userData = await this.userService.getUserProfile(this.userId!);
     } catch (error) {
       this.userData = undefined;
       this.alertService.errorSnackBar('Failed to load user profile data.');
@@ -57,9 +72,8 @@ export class ProfilePageComponent implements OnInit {
     }
     this.isLoadingPosts = true;
     try {
-      this.postResponses = await this.postService.getPostsByUserId(11,0,this.userData.id!);
+      this.postResponses = await this.postService.getPostsByUserId(11,0,this.userId!);
     } catch (error) {
-      console.error(error);
       this.postResponses = undefined;
     } finally {
       this.isLoadingPosts = false;
@@ -68,14 +82,13 @@ export class ProfilePageComponent implements OnInit {
   }
 
   async loadRepos() {
-    this.isLoadingRepos = true;
     if (!this.userData) {
       return;
     }
+    this.isLoadingRepos = true;
     try {
-      this.reposResponses = await this.repoService.getReposByUserId(this.userData.id!);
+      this.reposResponses = await this.repoService.getReposByUserId(this.userId!);
     } catch (error) {
-      console.error(error);
       this.userData = undefined;
     } finally {
       this.isLoadingRepos = false;
@@ -92,4 +105,10 @@ export class ProfilePageComponent implements OnInit {
     this.isPostListShown = false;
     this.loadRepos();
   }
+
+  ngOnDestroy(): void {
+   if(this.pathSubscription)
+      this.pathSubscription.unsubscribe();
+  }
+
 }

@@ -18,7 +18,6 @@ export class MailConfirmationPageComponent implements OnInit {
 
   async ngOnInit() {
     this.isLoading = true;
-    console.log("Mail confirmation page");
     let email: string | null = this.route.snapshot.paramMap.get('email');
     let token: string | null = this.route.snapshot.paramMap.get('token');
     try{

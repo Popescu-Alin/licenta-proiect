@@ -5,6 +5,7 @@ import { LoginPageModule } from './login-page/login-page.module';
 import { SignUpPageModule } from './sign-up-page/sign-up-page.module';
 import { ProfilePageModule } from './profile-page/profile-page.module';
 import { MailConfirmationPageModule } from './mail-confirmation-page/mail-confirmation-page.module';
+import { PostPageModule } from './post-page/post-page.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { MailConfirmationPageModule } from './mail-confirmation-page/mail-confir
     SignUpPageModule,
     ProfilePageModule,
     MailConfirmationPageModule,
+    PostPageModule,
   ]
 })
 export class PageModule { }

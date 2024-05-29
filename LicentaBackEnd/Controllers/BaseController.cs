@@ -14,9 +14,9 @@ namespace LicentaBackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BaseController: ControllerBase
+    public class BaseController : ControllerBase
     {
-        private readonly PostService PostService;   
+        private readonly PostService PostService;
         private readonly UserManager<User> UserManager;
         private readonly AuthenticationService AuthenticationService;
         private readonly UserService UserService;
@@ -41,7 +41,7 @@ namespace LicentaBackEnd.Controllers
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> RegisterUser([FromBody] RegistrationDTO body)
-        {   
+        {
             if (!body.Password.Equals(body.ConfirmPassword))
             {
                 return BadRequest();
@@ -62,15 +62,15 @@ namespace LicentaBackEnd.Controllers
             {
                 return BadRequest();
             }
-            
-           
+
+
         }
 
         [HttpPut]
         [Route("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string email, string token)
         {
-               
+
             try
             {
                 User user = await UserManager.FindByEmailAsync(email);
@@ -78,7 +78,7 @@ namespace LicentaBackEnd.Controllers
                 {
                     return BadRequest();
                 }
-                IdentityResult result =  UserManager.ConfirmEmailAsync(user, token).Result;
+                IdentityResult result = UserManager.ConfirmEmailAsync(user, token).Result;
                 if (result.Succeeded)
                 {
                     user.EmailConfirmed = true;
@@ -151,13 +151,37 @@ namespace LicentaBackEnd.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("posts/get-posts-by-id/{take}/{offSet}")]
+        public async Task<ActionResult<PostResponse>> GetPostById(Guid postId)
+        {
+            Guid userId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            try
+            {
+                PostResponse? postResponse = PostService.getPostResponse(postId, userId);
+                if (postResponse == null)
+                {
+                    return BadRequest();
+                }
+                return postResponse;
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
+
+
+        [Authorize]
+        [HttpGet]
         [Route("posts/get-posts-by-usreId/{take}/{offSet}/{userId}")]
         public async Task<ActionResult<IEnumerable<PostResponse>>> getPostsByUserId(int take, int offSet, Guid userId)
         {
-            
+
             try
             {
-                return PostService.getPostResponses(post=>post.UserId == userId,take,offSet ,userId);
+                return PostService.getPostResponses(post => post.UserId == userId, take, offSet, userId);
             }
             catch
             {
@@ -174,7 +198,7 @@ namespace LicentaBackEnd.Controllers
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
-            if(user == null)
+            if (user == null)
             {
                 return BadRequest();
             }
@@ -212,7 +236,7 @@ namespace LicentaBackEnd.Controllers
             User user = await UserManager.FindByIdAsync(UserClaimId);
             if (user == null)
             {
-                return  BadRequest();
+                return BadRequest();
             }
 
             Post post = PostService.GetById(id);
@@ -234,7 +258,7 @@ namespace LicentaBackEnd.Controllers
         [HttpPut]
         [Authorize]
         [Route("post/update-post/{id}")]
-        public async Task<ActionResult<PostResponse>> UpdatePost(Guid id,[FromBody] Post body)
+        public async Task<ActionResult<PostResponse>> UpdatePost(Guid id, [FromBody] Post body)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -292,11 +316,11 @@ namespace LicentaBackEnd.Controllers
             try
             {
                 Like like = LikeService.GetByConition(like => like.PostId == postId && like.UserId == user.Id);
-                if(like != null)
+                if (like != null)
                 {
                     return BadRequest("You already liked this post");
                 }
-                like =  new Like { PostId = postId, UserId = user.Id, Date = DateTime.UtcNow };
+                like = new Like { PostId = postId, UserId = user.Id, Date = DateTime.UtcNow };
                 LikeService.Add(like);
                 return true;
             }
@@ -346,7 +370,7 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpGet]
         [Route("comment/get-main-comments/{postId}/{take}/{offSet}")]
-        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId,int take, int offSet)
+        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId, int take, int offSet)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -380,7 +404,7 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpGet]
         [Route("comment/get-sub-comments/{postId}/{parentCommentId}/{take}/{offSet}")]
-        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId,Guid parentCommentId,int take, int offSet)
+        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId, Guid parentCommentId, int take, int offSet)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -414,7 +438,7 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpPost]
         [Route("comment/add-comment/{postId}/{parentCommetId}")]
-        public async Task<ActionResult<Comment>> AddComment(Guid postId, Guid? parentCommetId ,[FromBody] Comment body)
+        public async Task<ActionResult<Comment>> AddComment(Guid postId, Guid? parentCommetId, [FromBody] Comment body)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -429,7 +453,7 @@ namespace LicentaBackEnd.Controllers
                 body.PostId = postId;
                 body.ParentCommetId = parentCommetId;
                 Comment comment = CommentService.Add(body);
-                
+
                 return comment;
             }
             catch
@@ -459,7 +483,7 @@ namespace LicentaBackEnd.Controllers
 
             try
             {
-                if(comment.ParentCommetId != null)
+                if (comment.ParentCommetId != null)
                 {
                     return CommentService.Delete(id);
                 }
@@ -508,7 +532,7 @@ namespace LicentaBackEnd.Controllers
         [Route("repos/getReposByUserId/{id}")]
         public async Task<ActionResult<IEnumerable<RepositoryResponse>>> GetReposByUserId(Guid id)
         {
-            
+
             User user = await UserManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
@@ -517,11 +541,11 @@ namespace LicentaBackEnd.Controllers
 
             try
             {
-               List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
-               IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
+                List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
+                IQueryable<Repository> repos = RepositoryService.GetMany(repo => reposIds.Contains(repo.Id));
                 List<RepositoryResponse> repoResponses = repos.Select(repo => new RepositoryResponse() { Repository = repo }).ToList();
 
-                foreach( RepositoryResponse repoResponse in repoResponses)
+                foreach (RepositoryResponse repoResponse in repoResponses)
                 {
                     repoResponse.numberOfUsers = UserRepositoryService.GetMany(userRepo => userRepo.RepositoryId == repoResponse.Repository.Id).Count();
                     repoResponse.numberOfPosts = RepositoryPostService.GetMany(postRepo => postRepo.RepositoryId == repoResponse.Repository.Id).Count();
@@ -538,7 +562,7 @@ namespace LicentaBackEnd.Controllers
         [HttpGet]
         [Authorize]
         [Route("repos/getEditableReposByUserId/{userId}/{postId}")]
-        public async Task<ActionResult<IEnumerable<AddToRepoResponse>>> GetEditableReposByUserId(Guid userId,Guid postId)
+        public async Task<ActionResult<IEnumerable<AddToRepoResponse>>> GetEditableReposByUserId(Guid userId, Guid postId)
         {
 
             User user = await UserManager.FindByIdAsync(userId.ToString());
@@ -716,7 +740,7 @@ namespace LicentaBackEnd.Controllers
             try
             {
                 RepositoryPost repoPost = RepositoryPostService.GetByConition(repoPost => repoPost.RepositoryId == repoId && repoPost.PostId == postId);
-                if(repoPost == null)
+                if (repoPost == null)
                 {
                     return BadRequest();
                 }
@@ -733,7 +757,7 @@ namespace LicentaBackEnd.Controllers
         [Route("/email/{email}")]
         public void SendEmail(string email) {
 
-            EmailService.SendEmailConfirmationMail(email," ");
+            EmailService.SendEmailConfirmationMail(email, " ");
         }
 
         [Authorize]
@@ -743,8 +767,8 @@ namespace LicentaBackEnd.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(userId);
-            
-            if(user == null)
+
+            if (user == null)
             {
                 return BadRequest();
             }
@@ -768,10 +792,10 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpGet]
         [Route("/user/profile/get-profile-by-id")]
-        public async Task<ActionResult<UserProfileDTO>> GetProfileById( Guid userId)
+        public async Task<ActionResult<UserProfileDTO>> GetProfileById(Guid userId)
         {
             User user = await UserManager.FindByIdAsync(userId.ToString());
-            if(user == null)
+            if (user == null)
             {
                 return BadRequest();
             }
@@ -791,5 +815,167 @@ namespace LicentaBackEnd.Controllers
 
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("/repo/get-user-repos/{repoId}")]
+        public async Task<ActionResult<List<RepoUserBasicInfo>>> GetUserRepos(Guid repoId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User user = await UserManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            Repository repo = RepositoryService.GetById(repoId);
+            if (repo == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return UserRepositoryService.GetUserOfRepo(repoId);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/userRepos/add-user-to-repo")]
+        public async Task<ActionResult<bool>> AddUserToRepo([FromBody] UserRepository userRepo)
+        {
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User user = await UserManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            Repository repo = RepositoryService.GetById(userRepo.RepositoryId);
+            if (repo == null)
+            {
+                return BadRequest();
+            }
+
+            user = await UserManager.FindByIdAsync(userRepo.UserId.ToString());
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var entity = UserRepositoryService.GetByConition(entity => userRepo.UserId == entity.UserId && userRepo.RepositoryId == entity.RepositoryId);
+
+                if (entity != null)
+                {
+                    return BadRequest();
+                }
+
+                UserRepositoryService.Add(userRepo);
+
+                return true;
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("/userRepos/update-user-repo")]
+        public async Task<ActionResult<bool>> UpdateUserRepo([FromBody] UserRepository userRepo)
+        {
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User user = await UserManager.FindByIdAsync(userId);
+
+            try
+            {
+                var entity = UserRepositoryService.GetByConition(entity => userRepo.UserId == entity.UserId && userRepo.RepositoryId == entity.RepositoryId);
+
+                if (entity == null)
+                {
+                    return BadRequest();
+                }
+
+                entity.Privileges = userRepo.Privileges;
+
+                UserRepositoryService.Update(entity);
+
+                return true;
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("/userRepos/delete-user-repo/{userId}/{repoId}")]
+        public async Task<ActionResult<bool>> DeleteUserRepo(Guid userId, Guid repoId)
+        {
+
+            try
+            {
+                var entity = UserRepositoryService.GetByConition(entity => userId == entity.UserId && repoId == entity.RepositoryId);
+
+                if (entity == null)
+                {
+                    return BadRequest();
+                }
+                UserRepositoryService.Delete(entity => userId == entity.UserId && repoId == entity.RepositoryId);
+                return true;
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("/users/search-user/{searchString}")]
+        public async Task<ActionResult<List<BasicUserInfo>>> SearchUser(string searchString)
+        {
+            try
+            {
+                return UserService.GetMany(user => user.UserName.ToLower().Contains(searchString.ToLower())).Take(25).Select(user => new BasicUserInfo() { UserId = user.Id, UserName = user.UserName, ImageURL = user.ProfilePicture }).ToList();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("/post/search-post/{searchString}")]
+        public async Task<ActionResult<List<PostResponse>>> SearchPost(string searchString){
+            return BadRequest();
+        }
+
+
+        [Authorize]
+        [HttpDelete]
+        [Route("/auth/isAuth")]
+        public async Task<ActionResult<bool>> IsAuth()
+        {
+            return true;
+        }
     }
+
+    
 }

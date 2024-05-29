@@ -80,3 +80,5 @@ D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\System.Net.Http.Formatting.dll
 D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\System.Web.Http.dll
 D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\Newtonsoft.Json.dll
 D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\Npgsql.dll
+D:\ProiectLicenta\LicentaBackEnd\bin\Debug\net6.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

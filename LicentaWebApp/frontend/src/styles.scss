@@ -106,6 +106,10 @@ $color: black;
   width: 500px;
 }
 
+.h-400{
+  height: 400px;
+}
+
 html {
     height: 100%;
 }
@@ -113,4 +117,61 @@ html {
 .square-240px{
   width: 240px;
   height: 240px;
+}
+
+.m-20{
+  margin: 20px;
+}
+
+.w-100px{
+  width: 100px;
+}
+
+.w-300{
+  width: 300px;
+}
+
+.w-40{
+  width:40px;
+}
+
+.h-250px{
+  height: 250px;
+}
+
+.h-300px{
+  height: 300px;
+}
+
+.w-600{
+  width: 600px;
+}
+
+.overflow-auto{
+  overflow: auto;
+}
+
+.search-input{
+  width: 300px;
+  border: none;
+  border-bottom: 1px solid #787878;
+  outline: none;
+  padding: 5px;
+  font-size: 16px;
+  
+}
+
+.border-buttom{
+  border-bottom: 1px solid #787878;
+}
+
+.cdk-overlay-container{
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.min-w-600{
+  min-width: 600px;
 }

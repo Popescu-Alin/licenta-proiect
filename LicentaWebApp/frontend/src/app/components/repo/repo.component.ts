@@ -11,9 +11,23 @@ export class RepoComponent implements OnInit {
 
   @Input() repositoryResponse: RepositoryResponse | undefined;
   accessModifiers = AccessModifiers;
+
+  isModalOpen = false;  
   constructor() { }
 
   ngOnInit() {
+  }
+
+  openModal(){
+    this.isModalOpen = true;
+  }
+
+  closeModal(){
+    this.isModalOpen = false;
+  }
+
+  updateUserNumber(number: number){
+    this.repositoryResponse!.numberOfUsers = number;
   }
 
 }

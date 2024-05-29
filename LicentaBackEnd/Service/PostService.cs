@@ -101,5 +101,29 @@ namespace LicentaBackEnd.Service
             return postResponses;
 
         }
+
+        public PostResponse? getPostResponse(Guid postId, Guid userIdOfTheCaller)
+        {
+            Post post = GetById(postId);
+            if (post == null)
+            {
+                return null;
+            }
+            User user = UserService.GetById(post.UserId);
+            if (user == null)
+            {
+                return null;
+            }
+            PostResponse postResponse = new PostResponse
+            {
+                Post = post,
+                UserInfo = new BasicUserInfo { UserId = user.Id, UserName = user.UserName, ImageURL = user.ProfilePicture}
+            };
+            postResponse.NumberOfComments = CommentService.GetMany(comment => comment.PostId == postResponse.Post.Id).Count();
+            postResponse.NumberOfLikes = LikeService.GetMany(like => like.PostId == postResponse.Post.Id).Count();
+            postResponse.IsLiked = LikeService.GetMany(like => like.PostId == postResponse.Post.Id && like.UserId == userIdOfTheCaller).Count() > 0;
+            postResponse.IsSaved = RepositoryPostService.GetMany(entity => entity.PostId == postResponse.Post.Id).Count() > 0;
+            return postResponse;
+        }
     }
 }

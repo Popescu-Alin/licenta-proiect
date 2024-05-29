@@ -13,6 +13,9 @@ import { ReposListComponent } from './repos-list/repos-list.component';
 import { AddRepoModalComponent } from './add-repo-modal/add-repo-modal.component';
 import { SavePostPanelComponent } from './save-post-panel/save-post-panel.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ListEditRepoUsersComponent } from './list-edit-repo-users/list-edit-repo-users.component';
+import { ShowEditDeleteRepoUserComponent } from './show-edit-delete-repo-user/show-edit-delete-repo-user.component';
+import { FullPagePostModalComponent } from './full-page-post-modal/full-page-post-modal.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -31,6 +34,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ReposListComponent,
     AddRepoModalComponent,
     SavePostPanelComponent,
+    ListEditRepoUsersComponent,
+    ShowEditDeleteRepoUserComponent,
+    FullPagePostModalComponent,
   ],
   exports: [
     PostComponent,
@@ -44,6 +50,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ReposListComponent,
     AddRepoModalComponent,
     SavePostPanelComponent,
+    ListEditRepoUsersComponent,
+    ShowEditDeleteRepoUserComponent,
+    FullPagePostModalComponent,
   ]
 })
 export class ComponentsModule { }
