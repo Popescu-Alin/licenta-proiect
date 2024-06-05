@@ -1,0 +1,27 @@
+::ng-deep .tui-image-editor-help-menu li:nth-child(5) , ::ng-deep .tui-image-editor-help-menu li:nth-child(7){
+    display: none !important;
+}
+
+::ng-deep .tui-image-editor-header-logo{
+    display: none !important;
+}
+
+::ng-deep .tui-image-editor-menu li:nth-child(1),
+::ng-deep .tui-image-editor-menu li:nth-child(6),
+::ng-deep .tui-image-editor-menu li:nth-child(7),
+::ng-deep .tui-image-editor-menu li:nth-child(9),
+::ng-deep .tui-image-editor-menu li:nth-child(10){
+    display: none !important;
+}
+
+::ng-deep .tui-image-editor-download-btn{
+    display: none !important;
+}
+
+::ng-deep .tui-image-editor-header-buttons{
+    display: none !important;
+}
+
+.display-none{
+    display: none;
+}

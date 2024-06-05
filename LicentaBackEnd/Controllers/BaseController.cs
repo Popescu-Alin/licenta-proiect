@@ -9,6 +9,7 @@ using System.Security.Claims;
 using LicentaBackEnd.DBContext;
 using System.Net;
 using LicentaBackEnd.Constants;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace LicentaBackEnd.Controllers
 {
@@ -25,7 +26,8 @@ namespace LicentaBackEnd.Controllers
         private readonly RepositoryService RepositoryService;
         private readonly RepositoryPostService RepositoryPostService;
         private readonly UserRepositoryService UserRepositoryService;
-        public BaseController(UserManager<User> userManager, AuthenticationService authenticationService, PostService postService, UserService userService, CommentService commentService, LikeService likeService, RepositoryService repositoryService, RepositoryPostService repositoryPostService, UserRepositoryService userRepositoryService)
+        private readonly IWebHostEnvironment HostingEnvironment;
+        public BaseController(UserManager<User> userManager, AuthenticationService authenticationService, PostService postService, UserService userService, CommentService commentService, LikeService likeService, RepositoryService repositoryService, RepositoryPostService repositoryPostService, UserRepositoryService userRepositoryService, IWebHostEnvironment hostingEnvironment)
         {
             UserManager = userManager;
             AuthenticationService = authenticationService;
@@ -36,6 +38,7 @@ namespace LicentaBackEnd.Controllers
             RepositoryService = repositoryService;
             RepositoryPostService = repositoryPostService;
             UserRepositoryService = userRepositoryService;
+            HostingEnvironment = hostingEnvironment;
         }
 
         [HttpPost]
@@ -151,7 +154,7 @@ namespace LicentaBackEnd.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("posts/get-posts-by-id/{take}/{offSet}")]
+        [Route("posts/get-post-by-id/{postId}")]
         public async Task<ActionResult<PostResponse>> GetPostById(Guid postId)
         {
             Guid userId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -161,7 +164,7 @@ namespace LicentaBackEnd.Controllers
                 PostResponse? postResponse = PostService.getPostResponse(postId, userId);
                 if (postResponse == null)
                 {
-                    return BadRequest();
+                    return NotFound();
                 }
                 return postResponse;
             }
@@ -190,23 +193,44 @@ namespace LicentaBackEnd.Controllers
 
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("images/upload-post-image")]
+        public async Task<ActionResult<UploadImageResponse>> UploadPostImage( IFormFile file)
+        {
+            try
+            {
+                return new UploadImageResponse() { Response = await ImageService.SaveImage(this.HostingEnvironment.ContentRootPath, file) };
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
         [Authorize]
         [HttpPost]
         [Route("posts/add-post")]
-        public async Task<ActionResult<PostResponse>> AddPost([FromBody] Post body)
+        public async Task<ActionResult<PostResponse>> AddPost([FromBody] AddPostDto body)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
             if (user == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             try
             {
-                body.Id = new Guid();
-                body.UserId = user.Id;
-                Post post = PostService.Add(body);
+                Post newPost = new Post
+                {
+                    Id = new Guid(),
+                    UserId = user.Id,
+                    Content = body.Content,
+                    Url = body.FileName,
+                    CreatedDate = DateTime.UtcNow,
+
+                };
+                Post post = PostService.Add(newPost);
                 return new PostResponse
                 {
                     Post = post,
@@ -370,7 +394,7 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpGet]
         [Route("comment/get-main-comments/{postId}/{take}/{offSet}")]
-        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId, int take, int offSet)
+        public async Task<ActionResult<MainCommmentResposeCollection>> GetComments(Guid postId, int take, int offSet)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -386,12 +410,11 @@ namespace LicentaBackEnd.Controllers
                 {
                     return BadRequest();
                 }
-                IQueryable<Comment> comments = CommentService.GetMany(comment => comment.PostId == postId && comment.ParentCommetId == null);
 
-                return new SlicedCollection<Comment>()
+                return new MainCommmentResposeCollection()
                 {
-                    Collection = comments.Skip(offSet).Take(take).ToList(),
-                    TotalCount = comments.Count()
+                    Collection = CommentService.GetMainCommentRepsonses(comment => comment.PostId == postId && comment.ParentCommetId == null, take, offSet),
+                    TotalCount = CommentService.GetMany(comment => comment.PostId == postId && comment.ParentCommetId == null).Count()
                 };
             }
             catch
@@ -404,7 +427,7 @@ namespace LicentaBackEnd.Controllers
         [Authorize]
         [HttpGet]
         [Route("comment/get-sub-comments/{postId}/{parentCommentId}/{take}/{offSet}")]
-        public async Task<ActionResult<SlicedCollection<Comment>>> GetComments(Guid postId, Guid parentCommentId, int take, int offSet)
+        public async Task<ActionResult<SlicedCollection<CommentResponse>>> GetSubComments(Guid postId, Guid parentCommentId, int take, int offSet)
         {
             string UserClaimId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             User user = await UserManager.FindByIdAsync(UserClaimId);
@@ -420,9 +443,9 @@ namespace LicentaBackEnd.Controllers
                 {
                     return BadRequest();
                 }
-                IQueryable<Comment> comments = CommentService.GetMany(comment => comment.PostId == postId && comment.ParentCommetId == parentCommentId);
+                IQueryable<CommentResponse> comments  = CommentService.GetManyCommnetResponses(comment => comment.PostId == postId && comment.ParentCommetId == parentCommentId);
 
-                return new SlicedCollection<Comment>()
+                return new SlicedCollection<CommentResponse>()
                 {
                     Collection = comments.Skip(offSet).Take(take).ToList(),
                     TotalCount = comments.Count()
@@ -770,7 +793,7 @@ namespace LicentaBackEnd.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             List<Guid> reposIds = UserRepositoryService.GetMany(repo => repo.UserId == user.Id).Select(userRepos => userRepos.RepositoryId).ToList();
@@ -969,12 +992,37 @@ namespace LicentaBackEnd.Controllers
 
 
         [Authorize]
-        [HttpDelete]
+        [HttpGet]
         [Route("/auth/isAuth")]
         public async Task<ActionResult<bool>> IsAuth()
         {
             return true;
         }
+
+
+        [Authorize]
+        [HttpPut]
+        [Route("/user/update-user-image")]
+        public async Task<ActionResult<UploadImageResponse>> UpdateUserImage(IFormFile file)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                ImageService.DeleteImage(this.HostingEnvironment.ContentRootPath, user.ProfilePicture);
+                user.ProfilePicture = await ImageService.SaveImage(this.HostingEnvironment.ContentRootPath, file) ?? "";
+                await UserManager.UpdateAsync(user);
+                return new UploadImageResponse() { Response = user.ProfilePicture};
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }   
     }
 
     

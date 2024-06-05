@@ -1,0 +1,47 @@
+<div class="full-height">
+  <ng-container *ngIf="isLoading;else dataLoaded">
+    <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoading">
+      <div class="circle-ripple"></div>
+    </div>
+  </ng-container>
+  <ng-template #dataLoaded>
+    <div class="full-width full-height d-flex flex-column bg-secondeary border-color">
+      <div class="full-width full-height d-flex flex-column">
+        <ng-container *ngIf="mainComments?.totalCount && mainComments?.collection; else noComments">
+          <div class="p-1" *ngFor="let comment of mainComments?.collection">
+            <div class="d-flex flex-row">
+              <div class="d-flex flex-column">
+  
+                <span class="text-muted">
+                  comment: {{comment.comment?.content}}
+                </span>
+              </div>
+            </div>
+          </div>
+  
+        </ng-container>
+      </div>
+      
+      <ng-template #noComments>
+        <div class="full-width full-height justify-content-center align-items-center">
+          <div class="align-self-center d-flex flex-column align-items-center">
+            <span class="pi pi-ban fs-rem-7"></span>
+            <span class="text-muted fs-rem-1">No comments availabel</span>
+          </div>
+        </div>
+      </ng-template>
+
+      <div class="p-1 ">
+        <form [formGroup]="form" class=" d-flex flex-row">
+          <textarea class="form-control border-color" formControlName="comment" rows="3"
+            style="height: 50px; resize: none; background-color: white;"></textarea>
+          <em class="pi pi-send align-self-center ps-1 fs-rem-1" [ngClass]="{'clickable': !form.invalid}"
+            (click)="addComment()"></em>
+        </form>
+      </div>
+    </div>
+
+
+
+  </ng-template>
+</div>

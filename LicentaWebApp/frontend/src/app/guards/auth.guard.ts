@@ -1,22 +1,24 @@
 // auth.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { DataReciverService } from '../services/data-reciver.service';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private router: Router,
-              private dataReciver: DataReciverService) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
-  canActivate(): boolean {
-    const token: string | undefined = this.dataReciver.getToken();
-    if (token != undefined && token != null) {
-      return true; 
-    } else {
-      this.router.navigate(['/auth/login']);
-      return false;
-    }
+  async canActivate(): Promise<boolean> {
+    return this.authService
+      .isAuth()
+      .then((isAuthenticated) => {
+        return true;
+      })
+      .catch((error) => {
+        console.error('Authentication check failed', error);
+        this.router.navigate(['/auth/login']);
+        return false;
+      });
   }
 }

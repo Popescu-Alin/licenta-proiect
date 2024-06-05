@@ -2,19 +2,17 @@
   <div class="card-header d-flex justify-content-between ">
     <span>
       <a href="/profile/{{postResponse.userInfo?.userId}}" class="text-decoration-none">
-        <img src="" class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
-        <span class="text-muted">{{postResponse!.userInfo?.userName}}</span>
+        <img *ngIf="postResponse.userInfo?.imageURL" src={{urlUtil.getFullUrl(postResponse.userInfo?.imageURL!)}} class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+        <img *ngIf="!postResponse.userInfo?.imageURL" src="../../../assets/default-images/user-image.png" class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+        <span class="text-muted ps-1">{{postResponse!.userInfo?.userName}}</span>
       </a>
     </span>
     <span class="text-muted align-self-center">{{postResponse!.post?.createdDate | date:'short'}}</span>
   </div>
-
-  <img src={{postResponse.post?.url}} class="d-block user-select-none" width="100%" height="200"
+  <div class="card-body clickable" style="padding: 1px;" (click)="redirectToPost(postResponse.post?.id)">
+    <img src={{urlUtil.getFullUrl(postResponse.post?.url!)}} class="d-block user-select-none" width="100%" height="200"
     aria-label="Placeholder: Image " focusable="false" />
-  <div class="card-body">
-    <p class="card-text">{{postResponse.post?.content}}</p>
   </div>
-
   <div class="card-footer text-muted">
     <div class="d-flex justify-content-between">
 

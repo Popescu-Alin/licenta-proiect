@@ -10,6 +10,7 @@ import { PageModule } from './pages/page.module';
 import { ComponentsModule } from './components/compoments.module';
 import { API_BASE_URL, Client } from './client/client';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { API_URL } from './constants/constants';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     CustomAlertService,
     PageModule,
     ComponentsModule,
-    {provide: API_BASE_URL, useValue: 'https://localhost:7242'},
+    {provide: API_BASE_URL, useValue: API_URL},
     Client,
     {provide: HttpClient}
 

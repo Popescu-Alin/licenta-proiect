@@ -1,0 +1,25 @@
+<app-modal [isOpen]="isModalOpen" [title]="''" (closeModalEmitter)="closeModalEmitter.emit()">
+  <div style="width: 600px;">
+    <div [ngClass]="{'display-none': isPreviewOpen}" *ngIf="!isImageSelected">
+       <app-image-editor (imageEmitter)="useImage($event)" [allowPreview]="true" (imagePreview)="setImagePreview($event)"></app-image-editor>
+    </div>
+    <div *ngIf="isPreviewOpen" class="d-flex flex-column">
+      <div>
+        <label class="form-label mt-4"> Upload image</label>
+        <em class="pi pi-eye-slash clickable ms-2" (click)="closePrieview()"></em>
+      </div>
+      
+      <img [src]="previewImageSrc" alt="profile image" class="avatar align-self-center pt-1" />
+    </div>
+    <div *ngIf="isImageSelected" class="d-flex flex-column justify-content-center">
+      <img [src]="imageSrc" alt="profile image" class="avatar align-self-center pt-1" />
+    </div>
+    <div class="d-flex flex-row justify-content-center pt-2">
+      <button class="btn btn-primary me-2 align-self-center d-flex" [disabled]="!isImageSelected" (click)="uploadImage()">
+        <span class="loader" *ngIf="isLoading"></span> 
+        Save
+      </button>
+      <button class="btn btn-danger ms-2"  (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</app-modal>

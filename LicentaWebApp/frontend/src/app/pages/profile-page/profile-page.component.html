@@ -6,11 +6,11 @@
 
     <div class="profile-container full-width d-flex flex-column justify-content-center mt-1 pt-1" *ngIf="userData">
       <div>
-        <label for="image-upload" class="clickable" *ngIf="appUserId == userId">
-        <img *ngIf="userData.imageURL" [src]="userData.imageURL" alt="profile image"
+        <em class="pi pi-pencil clickable"  *ngIf="appUserId == userId" (click)="openModal()"></em>
+        <img *ngIf="userData.imageURL" [src]="urlUtil.getFullUrl(userData.imageURL!)" alt="profile image"
           class="avatar align-self-center pt-1" />
         <img *ngIf="!userData.imageURL" src="../../../assets/default-images/user-image.png" alt="profile image"
-          class="avatar  align-self-center pt-1" /></label> 
+          class="avatar  align-self-center pt-1" />
       </div>
       <span class="fs-3 text-color-black">{{userData.userName}}</span>
       <span class="fs-5">Posts {{userData.numberOfPosts}} | Repos {{userData.numberOfRepos}}</span>
@@ -54,3 +54,4 @@
   </div>
 </div>
 
+<app-upload-profile-image-modal *ngIf="appUserId == userId && isModalOpen" [isModalOpen]="isModalOpen" (closeModalEmitter)="closeModal()" (newImageURLEmitter)="changeProfileURL($event)"></app-upload-profile-image-modal>

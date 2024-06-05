@@ -16,6 +16,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ListEditRepoUsersComponent } from './list-edit-repo-users/list-edit-repo-users.component';
 import { ShowEditDeleteRepoUserComponent } from './show-edit-delete-repo-user/show-edit-delete-repo-user.component';
 import { FullPagePostModalComponent } from './full-page-post-modal/full-page-post-modal.component';
+import { ImageEditorComponent } from './image-editor/image-editor.component';
+import { UploadProfileImageModalComponent } from './upload-profile-image-modal/upload-profile-image-modal.component';
+import { DisplayMessageModalComponent } from './display-message-modal/display-message-modal.component';
+import { ListCommentsComponent } from './list-comments/list-comments.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -37,6 +41,10 @@ import { FullPagePostModalComponent } from './full-page-post-modal/full-page-pos
     ListEditRepoUsersComponent,
     ShowEditDeleteRepoUserComponent,
     FullPagePostModalComponent,
+    ImageEditorComponent,
+    UploadProfileImageModalComponent,
+    DisplayMessageModalComponent,
+    ListCommentsComponent,
   ],
   exports: [
     PostComponent,
@@ -53,6 +61,10 @@ import { FullPagePostModalComponent } from './full-page-post-modal/full-page-pos
     ListEditRepoUsersComponent,
     ShowEditDeleteRepoUserComponent,
     FullPagePostModalComponent,
+    ImageEditorComponent,
+    UploadProfileImageModalComponent,
+    DisplayMessageModalComponent,
+    ListCommentsComponent,
   ]
 })
 export class ComponentsModule { }

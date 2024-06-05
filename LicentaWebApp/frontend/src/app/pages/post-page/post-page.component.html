@@ -1,3 +1,49 @@
 <div class="page-content p-0 m-0">
+  <ng-container *ngIf="!isLoadingPost;else isLoading">
+    <div class="full-width full-height d-flex flex-row justify-content-center">
+      <div class="card post-style align-self-center" *ngIf="postResponse">
+        <div class="card-header d-flex justify-content-between">
+          <span>
+            <a href="/profile/{{postResponse.userInfo?.userId}}" class="text-decoration-none">
+              <img [src]="urlUtil.getFullUrl(this.postResponse.userInfo?.imageURL!)" class="rounded-circle" width="30"
+                height="30" aria-label="Placeholder: Image " focusable="false" />
+              <span class="text-muted ps-2">{{postResponse!.userInfo?.userName}}</span>
+            </a>
+          </span>
+          <span class="text-muted align-self-center">{{postResponse!.post?.createdDate | date:'short'}}</span>
+        </div>
+        <div class="card-body" style="padding: 1px;">
+          <img src={{urlUtil.getFullUrl(postResponse.post?.url!)}} class="d-block user-select-none post-body"
+            aria-label="Placeholder: Image " focusable="false" />
+        </div>
+        <div class="card-footer text-muted">
+          <div class="d-flex justify-content-between">
 
+            <span>{{postResponse.numberOfLikes}}
+              <em class="clickable pi " (click)="likeDislikePost()"
+                [ngClass]="{'isLiked pi-thumbs-up-fill ': postResponse.isLiked, 'pi-thumbs-up': !postResponse.isLiked}"></em>
+            </span>
+
+            <span>{{postResponse.numberOfComments}} {{ postResponse.numberOfComments == 1 ?
+              'comment':'comments'}}</span>
+
+            <em class="clickable pi" (click)="openSavePanel()"
+              [ngClass]="{'pi-bookmark-fill': postResponse.isSaved, 'pi-bookmark': !postResponse.isSaved}"></em>
+
+          </div>
+        </div>
+        <app-save-post-panel *ngIf="savePanelOpen" [isModalOpen]="savePanelOpen" (closeModalEmitter)="closeSavePanel()"
+          (responseEmitter)="updateSaveStatus($event)" [postId]="postResponse.post!.id!"></app-save-post-panel>
+      </div>
+      <app-list-comments [postId]="postResponse?.post?.id!" class="comment-height align-self-center "></app-list-comments>
+    </div>
+    <app-display-message-modal (closeModalEmitter)="closeDescription()"
+      [isModalOpen]="isDescriptionOpen"></app-display-message-modal>
+  </ng-container>
+  <ng-template #isLoading>
+    <div class="full-width full-height d-flex justify-content-center align-items-center"*ngIf="isLoading">
+      <div class="circle-ripple"></div>
+    </div>
+  </ng-template>
+  
 </div>

@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Post, PostResponse } from '../../client/client';
-import { Subscription } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { AddPostDto, FileParameter, PostResponse, UploadImageResponse } from '../../client/client';
 import { PostService } from '../../services/post.service';
 import { CustomAlertService } from '../../services/custom-alert.service';
+import { FileParameterClass } from '../../utils/helper-class';
 
 @Component({
   selector: 'app-add-post-modal',
@@ -17,8 +17,10 @@ export class AddPostModalComponent implements OnInit {
   @Output() postResponseEmitter = new EventEmitter<PostResponse>();
 
   postForm!: FormGroup; 
-  subcriptions: Subscription[] = [];
   isLoading = false;
+  isImageSelected: boolean = false;
+  image: Blob | undefined;
+  imageSrc: string | ArrayBuffer | null = null;
 
   constructor( private formBuilder: FormBuilder,
                private postService: PostService,
@@ -30,35 +32,43 @@ export class AddPostModalComponent implements OnInit {
 
   initForm() {
     this.postForm = this.formBuilder.group({
-      url: ['', [Validators.required]],
       description: [''],
     });
   }
 
-  savePost() {
-    let post: Post = new Post({
-      url: this.postForm.value.url,
+  async savePost() {
+    let post: AddPostDto = new AddPostDto({
       content: this.postForm.value.description,
-      createdDate: new Date(),
       userId: undefined,
-      id: undefined
+      fileName: "image.jpg",
     });
-    
-    this.subcriptions.push(this.postService.addPost(post).subscribe({
-      next: (postResponse: PostResponse | undefined) => {
-        if(postResponse != undefined) {
-          this.postResponseEmitter.emit(postResponse);
-          this.isLoading = false;
-          this.customAlertService.successSnackBar('Post added successfully');
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.customAlertService.genericErrorMessage();
+    let fp: FileParameter = new FileParameterClass(
+       this.image,
+      "image.jpg",
+    );
+    this.isLoading = true;
+    try{
+      let imageResponse: UploadImageResponse | undefined = await this.postService.uploadPostImage(fp);
+      if(!(imageResponse && imageResponse.response)) {
+        throw new Error();
       }
-    }));
+      post.fileName = imageResponse.response;
+      let postResponse = await this.postService.addPost(post);
+      if(postResponse != undefined) {
+        this.postResponseEmitter.emit(postResponse);
+        this.isLoading = false;
+        this.customAlertService.successSnackBar('Post added successfully');
+      }
+    }catch(error){
+      this.customAlertService.genericErrorMessage();
+    }finally{
+      this.isLoading = false;
+    }
+  }
 
-
-
+  useImage(image: Blob) {
+      this.isImageSelected = true;
+      this.imageSrc = URL.createObjectURL(image);
+      this.image = image;
   }
 }

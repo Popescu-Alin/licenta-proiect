@@ -14,7 +14,6 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
-
 export  class ClientBase {
     authToken = '';
     protected constructor() {
@@ -29,7 +28,6 @@ export  class ClientBase {
       return Promise.resolve(options);
     }
   }
-
 @Injectable({
     providedIn: 'root'
 })
@@ -338,6 +336,62 @@ export class Client extends ClientBase {
     /**
      * @return Success
      */
+    getPostById(postId: string): Observable<PostResponse> {
+        let url_ = this.baseUrl + "/api/Base/posts/get-post-by-id/{postId}";
+        if (postId === undefined || postId === null)
+            throw new Error("The parameter 'postId' must be defined.");
+        url_ = url_.replace("{postId}", encodeURIComponent("" + postId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return _observableFrom(this.transformOptions(options_)).pipe(_observableMergeMap(transformedOptions_ => {
+            return this.http.request("get", url_, transformedOptions_);
+        })).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetPostById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPostById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PostResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PostResponse>;
+        }));
+    }
+
+    protected processGetPostById(response: HttpResponseBase): Observable<PostResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PostResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getPostsByUsreId(take: number, offSet: number, userId: string): Observable<PostResponse[]> {
         let url_ = this.baseUrl + "/api/Base/posts/get-posts-by-usreId/{take}/{offSet}/{userId}";
         if (take === undefined || take === null)
@@ -405,10 +459,71 @@ export class Client extends ClientBase {
     }
 
     /**
+     * @param file (optional) 
+     * @return Success
+     */
+    uploadPostImage(file?: FileParameter | undefined): Observable<UploadImageResponse> {
+        let url_ = this.baseUrl + "/api/Base/images/upload-post-image";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (file === null || file === undefined)
+            throw new Error("The parameter 'file' cannot be null.");
+        else
+            content_.append("file", file.data, file.fileName ? file.fileName : "file");
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return _observableFrom(this.transformOptions(options_)).pipe(_observableMergeMap(transformedOptions_ => {
+            return this.http.request("post", url_, transformedOptions_);
+        })).pipe(_observableMergeMap((response_: any) => {
+            return this.processUploadPostImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUploadPostImage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UploadImageResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UploadImageResponse>;
+        }));
+    }
+
+    protected processUploadPostImage(response: HttpResponseBase): Observable<UploadImageResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UploadImageResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
-    addPost(body?: Post | undefined): Observable<PostResponse> {
+    addPost(body?: AddPostDto | undefined): Observable<PostResponse> {
         let url_ = this.baseUrl + "/api/Base/posts/add-post";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -697,7 +812,7 @@ export class Client extends ClientBase {
     /**
      * @return Success
      */
-    getMainComments(postId: string, take: number, offSet: number): Observable<CommentSlicedCollection> {
+    getMainComments(postId: string, take: number, offSet: number): Observable<MainCommmentResposeCollection> {
         let url_ = this.baseUrl + "/api/Base/comment/get-main-comments/{postId}/{take}/{offSet}";
         if (postId === undefined || postId === null)
             throw new Error("The parameter 'postId' must be defined.");
@@ -727,14 +842,14 @@ export class Client extends ClientBase {
                 try {
                     return this.processGetMainComments(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<CommentSlicedCollection>;
+                    return _observableThrow(e) as any as Observable<MainCommmentResposeCollection>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<CommentSlicedCollection>;
+                return _observableThrow(response_) as any as Observable<MainCommmentResposeCollection>;
         }));
     }
 
-    protected processGetMainComments(response: HttpResponseBase): Observable<CommentSlicedCollection> {
+    protected processGetMainComments(response: HttpResponseBase): Observable<MainCommmentResposeCollection> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -745,7 +860,7 @@ export class Client extends ClientBase {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CommentSlicedCollection.fromJS(resultData200);
+            result200 = MainCommmentResposeCollection.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -759,7 +874,7 @@ export class Client extends ClientBase {
     /**
      * @return Success
      */
-    getSubComments(postId: string, parentCommentId: string, take: number, offSet: number): Observable<CommentSlicedCollection> {
+    getSubComments(postId: string, parentCommentId: string, take: number, offSet: number): Observable<CommentResponseSlicedCollection> {
         let url_ = this.baseUrl + "/api/Base/comment/get-sub-comments/{postId}/{parentCommentId}/{take}/{offSet}";
         if (postId === undefined || postId === null)
             throw new Error("The parameter 'postId' must be defined.");
@@ -792,14 +907,14 @@ export class Client extends ClientBase {
                 try {
                     return this.processGetSubComments(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<CommentSlicedCollection>;
+                    return _observableThrow(e) as any as Observable<CommentResponseSlicedCollection>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<CommentSlicedCollection>;
+                return _observableThrow(response_) as any as Observable<CommentResponseSlicedCollection>;
         }));
     }
 
-    protected processGetSubComments(response: HttpResponseBase): Observable<CommentSlicedCollection> {
+    protected processGetSubComments(response: HttpResponseBase): Observable<CommentResponseSlicedCollection> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -810,7 +925,7 @@ export class Client extends ClientBase {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CommentSlicedCollection.fromJS(resultData200);
+            result200 = CommentResponseSlicedCollection.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1957,6 +2072,165 @@ export class Client extends ClientBase {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    isAuth(): Observable<boolean> {
+        let url_ = this.baseUrl + "/auth/isAuth";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return _observableFrom(this.transformOptions(options_)).pipe(_observableMergeMap(transformedOptions_ => {
+            return this.http.request("get", url_, transformedOptions_);
+        })).pipe(_observableMergeMap((response_: any) => {
+            return this.processIsAuth(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processIsAuth(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processIsAuth(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param file (optional) 
+     * @return Success
+     */
+    updateUserImage(file?: FileParameter | undefined): Observable<UploadImageResponse> {
+        let url_ = this.baseUrl + "/user/update-user-image";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (file === null || file === undefined)
+            throw new Error("The parameter 'file' cannot be null.");
+        else
+            content_.append("file", file.data, file.fileName ? file.fileName : "file");
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return _observableFrom(this.transformOptions(options_)).pipe(_observableMergeMap(transformedOptions_ => {
+            return this.http.request("put", url_, transformedOptions_);
+        })).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdateUserImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateUserImage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UploadImageResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UploadImageResponse>;
+        }));
+    }
+
+    protected processUpdateUserImage(response: HttpResponseBase): Observable<UploadImageResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UploadImageResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export class AddPostDto implements IAddPostDto {
+    fileName?: string | undefined;
+    content?: string | undefined;
+    userId?: string;
+
+    constructor(data?: IAddPostDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fileName = _data["fileName"];
+            this.content = _data["content"];
+            this.userId = _data["userId"];
+        }
+    }
+
+    static fromJS(data: any): AddPostDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddPostDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fileName"] = this.fileName;
+        data["content"] = this.content;
+        data["userId"] = this.userId;
+        return data;
+    }
+}
+
+export interface IAddPostDto {
+    fileName?: string | undefined;
+    content?: string | undefined;
+    userId?: string;
 }
 
 export class AddToRepoResponse implements IAddToRepoResponse {
@@ -2151,10 +2425,10 @@ export interface IComment {
     parentCommetId?: string | undefined;
 }
 
-export class CommentSlicedCollection implements ICommentSlicedCollection {
+export class CommentResponseSlicedCollection implements ICommentResponseSlicedCollection {
     totalCount?: number;
 
-    constructor(data?: ICommentSlicedCollection) {
+    constructor(data?: ICommentResponseSlicedCollection) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2169,9 +2443,9 @@ export class CommentSlicedCollection implements ICommentSlicedCollection {
         }
     }
 
-    static fromJS(data: any): CommentSlicedCollection {
+    static fromJS(data: any): CommentResponseSlicedCollection {
         data = typeof data === 'object' ? data : {};
-        let result = new CommentSlicedCollection();
+        let result = new CommentResponseSlicedCollection();
         result.init(data);
         return result;
     }
@@ -2183,7 +2457,7 @@ export class CommentSlicedCollection implements ICommentSlicedCollection {
     }
 }
 
-export interface ICommentSlicedCollection {
+export interface ICommentResponseSlicedCollection {
     totalCount?: number;
 }
 
@@ -2237,6 +2511,98 @@ export interface ILogInTokenRepsone {
     userName?: string | undefined;
     imageURL?: string | undefined;
     userId?: string | undefined;
+}
+
+export class MainCommentResponse implements IMainCommentResponse {
+    comment?: Comment;
+    userInfo?: BasicUserInfo;
+    subcommentsNumber?: number;
+
+    constructor(data?: IMainCommentResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.comment = _data["comment"] ? Comment.fromJS(_data["comment"]) : <any>undefined;
+            this.userInfo = _data["userInfo"] ? BasicUserInfo.fromJS(_data["userInfo"]) : <any>undefined;
+            this.subcommentsNumber = _data["subcommentsNumber"];
+        }
+    }
+
+    static fromJS(data: any): MainCommentResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new MainCommentResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["comment"] = this.comment ? this.comment.toJSON() : <any>undefined;
+        data["userInfo"] = this.userInfo ? this.userInfo.toJSON() : <any>undefined;
+        data["subcommentsNumber"] = this.subcommentsNumber;
+        return data;
+    }
+}
+
+export interface IMainCommentResponse {
+    comment?: Comment;
+    userInfo?: BasicUserInfo;
+    subcommentsNumber?: number;
+}
+
+export class MainCommmentResposeCollection implements IMainCommmentResposeCollection {
+    collection?: MainCommentResponse[] | undefined;
+    totalCount?: number;
+
+    constructor(data?: IMainCommmentResposeCollection) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["collection"])) {
+                this.collection = [] as any;
+                for (let item of _data["collection"])
+                    this.collection!.push(MainCommentResponse.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): MainCommmentResposeCollection {
+        data = typeof data === 'object' ? data : {};
+        let result = new MainCommmentResposeCollection();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.collection)) {
+            data["collection"] = [];
+            for (let item of this.collection)
+                data["collection"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+}
+
+export interface IMainCommmentResposeCollection {
+    collection?: MainCommentResponse[] | undefined;
+    totalCount?: number;
 }
 
 export class Post implements IPost {
@@ -2547,6 +2913,42 @@ export interface IRepositoryResponse {
     numberOfPosts?: number;
 }
 
+export class UploadImageResponse implements IUploadImageResponse {
+    response?: string | undefined;
+
+    constructor(data?: IUploadImageResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.response = _data["response"];
+        }
+    }
+
+    static fromJS(data: any): UploadImageResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadImageResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["response"] = this.response;
+        return data;
+    }
+}
+
+export interface IUploadImageResponse {
+    response?: string | undefined;
+}
+
 export class UserProfileDTO implements IUserProfileDTO {
     id?: string;
     userName?: string | undefined;
@@ -2645,6 +3047,11 @@ export interface IUserRepository {
     userId?: string;
     repositoryId?: string;
     privileges?: string | undefined;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export class ApiException extends Error {

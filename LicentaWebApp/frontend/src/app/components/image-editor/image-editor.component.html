@@ -1,0 +1,20 @@
+<link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css" />
+<script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.js"></script>
+
+<div class="d-flex flex-column" style="max-width: 600px; height: 500px;">
+  <div>
+    <label class="form-label mt-4"> Upload image</label>
+    <input type="file" id="fileInput" (change)="onFileChange($event)" accept="image/*" style="display: none;" />
+    <label for="fileInput" class=" ms-2 clickable pi pi-upload" *ngIf="!isAnImageUploaded"></label>
+  </div>
+  <div #tuiImageEditor id="tui-image-editor" class="full-width full-height"
+    [ngClass]="{'display-none': !isAnImageUploaded}"></div>
+  <div class="d-flex justify-content-around mt-1" *ngIf="isAnImageUploaded">
+    <input type="file" id="fileInput" (change)="onFileChange($event)" accept="image/*" style="display: none;" />
+    <label for="fileInput" class="clickable pi pi-upload"></label>
+    <em class="pi pi-download clickable" (click)="saveImage()"></em>
+    <em class="pi pi-check-circle clickable" (click)="useImage()"></em>
+    <em class="pi pi-eye clickable" *ngIf="allowPreview" (click)="enitPreviewImage()"></em>
+  </div>
+
+</div>

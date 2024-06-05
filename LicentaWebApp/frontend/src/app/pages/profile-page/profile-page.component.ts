@@ -11,6 +11,7 @@ import { CustomAlertService } from '../../services/custom-alert.service';
 import { RepoService } from '../../services/repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { DataReciverService } from '../../services/data-reciver.service';
+import { UrlUtil } from '../../utils/url-util';
 
 @Component({
   selector: 'app-profile-page',
@@ -30,6 +31,10 @@ export class ProfilePageComponent {
   pathSubscription: Subscription | undefined;
   appUserId: string | undefined;
 
+  isModalOpen: boolean = false;
+
+  urlUtil =  UrlUtil;
+  
   constructor(
     private postService: PostService,
     private alertService: CustomAlertService,
@@ -46,7 +51,6 @@ export class ProfilePageComponent {
     this.pathSubscription = this.route.paramMap.subscribe(params => {
       this.userId = this.route.snapshot.paramMap.get('id');
     this.loadUserData();
-    this.loadPosts();
     });
   }
 
@@ -57,6 +61,7 @@ export class ProfilePageComponent {
     this.isLoadingUser = true;
     try {
       this.userData = await this.userService.getUserProfile(this.userId!);
+      this.loadPosts();
     } catch (error) {
       this.userData = undefined;
       this.alertService.errorSnackBar('Failed to load user profile data.');
@@ -104,6 +109,20 @@ export class ProfilePageComponent {
   selectRepositories() {
     this.isPostListShown = false;
     this.loadRepos();
+  }
+
+  openModal(){
+    this.isModalOpen = true;
+  }
+
+  closeModal(){
+    this.isModalOpen = false;
+  }
+
+  changeProfileURL(newURL: string){
+    if(this.userData){
+      this.userData.imageURL = newURL;
+    }
   }
 
   ngOnDestroy(): void {

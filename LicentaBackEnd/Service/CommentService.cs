@@ -77,5 +77,52 @@ namespace LicentaBackEnd.Service
             return commentsWithSubComments;
 
         }
+
+        public IQueryable<CommentResponse> GetManyCommnetResponses(Func<Comment, bool>? condition)
+        {
+            IQueryable<Comment> comments = _context.Comments;
+            if (condition != null)
+            {
+                comments = comments.Where(condition).AsQueryable();
+            }
+
+            IQueryable<CommentResponse> commentResponses = comments.Join(_context.Users, c => c.UserId, u => u.Id,
+                                            (c, u) => new CommentResponse
+                                            {
+                                                Comment = c,
+                                                UserInfo = new BasicUserInfo()
+                                                {
+                                                    UserId = u.Id,
+                                                    UserName = u.FirstName,
+                                                    ImageURL = u.ProfilePicture
+                                                }
+                                            });
+            return commentResponses;
+                    
+        }
+        
+        public List<MainCommentResponse> GetMainCommentRepsonses(Func<Comment, bool> condition, int take, int skip)
+        {
+            List<Comment> comments = _context.Comments.Where(condition).Skip(skip).Take(take).OrderByDescending(c => c.Id).ToList();
+            
+            if(comments.Count == 0)
+            {
+                return new List<MainCommentResponse>();
+            }
+
+            List<MainCommentResponse> mainCommentRepsonses = comments.Join(_context.Users, c => c.UserId, u => u.Id,
+                                                           (c, u) => new MainCommentResponse
+                                                           {
+                                                Comment = c,
+                                                UserInfo = new BasicUserInfo()
+                                                {
+                                                    UserId = u.Id,
+                                                    UserName = u.FirstName,
+                                                    ImageURL = u.ProfilePicture
+                                                },
+                                                SubcommentsNumber = _context.Comments.Where(subComment => subComment.ParentCommetId == c.Id).Count()
+                                            }).ToList();
+            return mainCommentRepsonses;
+        }   
     }
 }

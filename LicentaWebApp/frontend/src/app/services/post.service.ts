@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DataReciverService } from './data-reciver.service';
-import { Client, Post, PostResponse } from '../client/client';
-import { Observable } from 'rxjs';
+import { AddPostDto, Client, FileParameter, Post, PostResponse, UploadImageResponse } from '../client/client';
 
 @Injectable({
   providedIn: 'root',
@@ -26,13 +25,18 @@ export class PostService {
     return this.client.getPostsByUsreId(take, skip, userID).toPromise();
   }
 
-  addPost(post: Post): Observable<PostResponse> {
+  addPost(post: AddPostDto): Promise<PostResponse | undefined> {
     this.client.setAuthToken(this.dataReciver.getToken()!);
-    return this.client.addPost(post);
+    return this.client.addPost(post).toPromise();
   }
 
   getPost(postId: string): Promise<PostResponse | undefined> {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.getPostById(postId).toPromise();
+  }
+
+  uploadPostImage(image: FileParameter): Promise<UploadImageResponse | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.uploadPostImage(image).toPromise();
   }
 }

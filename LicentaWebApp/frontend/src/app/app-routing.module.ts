@@ -15,6 +15,7 @@ export const routes: Routes = [
     { path: 'home', component: MainPageComponent, canActivate: [AuthGuard]},
     { path: 'profile/:id', component: ProfilePageComponent, canActivate: [AuthGuard]},
     { path: 'post/:id', component: PostPageComponent, canActivate: [AuthGuard]},
+    { path: 'search', component: MainPageComponent, canActivate: [AuthGuard]},
     { path: '', redirectTo: '/auth/login', pathMatch: 'full'}
 
 ];
