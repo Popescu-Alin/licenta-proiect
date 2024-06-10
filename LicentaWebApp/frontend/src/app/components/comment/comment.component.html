@@ -1,0 +1,38 @@
+<div class="d-flex p-1">
+  <a href="/profile/{{comment.comment?.userId}}" class="text-decoration-none">
+    <img *ngIf="comment.userInfo?.imageURL" src={{urlUtil.getFullUrl(comment.userInfo?.imageURL!)}}
+      class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+    <img *ngIf="!comment.userInfo?.imageURL" src="../../../assets/default-images/user-image.png" class="rounded-circle"
+      width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+  </a>
+  <div class="bubble bubble-left ps-1 d-flex flex-column full-width" *ngIf="!isEditMode">
+    <span class="text-muted text-wrap word-break">
+      {{comment.comment?.content}}
+    </span>
+    <div class="full-width d-flex border-top justify-content-center">
+      <em class="pi pi-trash clickable align-self-center pe-1" *ngIf="comment.userInfo?.userId === appUserID"
+        (click)="deleteComment()"></em>
+      <em class="pi pi-pencil clickable align-self-center pe-1" *ngIf="comment.userInfo?.userId === appUserID"
+        (click)="openEditMode()"></em>
+      <span class="text-muted align-self-end">{{comment.comment?.date | date: 'HH:mm'}}</span>
+    </div>
+
+  </div>
+
+  <div class="bubble bubble-left ps-1 d-flex flex-column full-width" *ngIf="isEditMode">
+    <span class="text-muted text-wrap word-break">
+      <form [formGroup]="form">
+        <textarea formControlName="comment" class="form-control border-color p-1 rounded-corners"
+          style="height: auto; resize: none; background-color: white;" ></textarea>
+      </form>
+    </span>
+    <div class="full-width d-flex border-top justify-content-center">
+      <em class="pi pi-times-circle clickable align-self-center pe-1" *ngIf="comment.userInfo?.userId === appUserID"
+        (click)="cancel()"></em>
+      <em class="pi pi-check-circle align-self-center pe-1" *ngIf="comment.userInfo?.userId === appUserID"
+        (click)="saveChanges()" [ngClass]="{'clickable': form.valid}"></em>
+      <span class="text-muted align-self-end">{{comment.comment?.date | date: 'HH:mm'}}</span>
+    </div>
+
+  </div>
+</div>

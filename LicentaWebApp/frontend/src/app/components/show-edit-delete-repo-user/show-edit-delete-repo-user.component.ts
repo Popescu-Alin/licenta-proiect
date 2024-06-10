@@ -3,6 +3,7 @@ import { RepoUserBasicInfo } from '../../client/client';
 import { RepoService } from '../../services/repo.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomAlertService } from '../../services/custom-alert.service';
+import { UrlUtil } from '../../utils/url-util';
 
 @Component({
   selector: 'app-show-edit-delete-repo-user',
@@ -15,6 +16,7 @@ export class ShowEditDeleteRepoUserComponent implements OnInit {
   @Input() repoId!: string;
   @Output() removedUserIdEmitter = new EventEmitter<string>();
 
+  urlUtil = UrlUtil
   isEditModeOpen: boolean = false;
   isLoading: boolean = false;
 
@@ -39,7 +41,6 @@ export class ShowEditDeleteRepoUserComponent implements OnInit {
   async deleteUser() {
     this.isLoading = true;
     try {
-      console.log(this.repoId, this.user.userID);
       await this.repoService.removeRepoUser(this.repoId, this.user.userID!);
       this.removedUserIdEmitter.emit(this.user.userID!);
       this.alertService.successSnackBar('User removed successfully!');

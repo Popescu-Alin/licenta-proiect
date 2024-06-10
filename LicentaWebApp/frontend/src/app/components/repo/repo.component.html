@@ -12,16 +12,18 @@
       <span class="text-muted align-self-center pi "
         [ngClass]="{'pi-globe': repositoryResponse.repository!.accessModifier == accessModifiers.Public, 'pi-lock':repositoryResponse.repository!.accessModifier == accessModifiers.Private}"></span>
     </div>
-    <img src="" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image "
-      focusable="false" />
+    <img *ngIf="repositoryResponse.imageURL != null" [src]="urlUtil.getFullUrl(repositoryResponse!.imageURL!)" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image "
+      focusable="false" (click)="regirectToRepo()"/>
+    <img *ngIf="repositoryResponse.imageURL == null" src="../../../assets/bg.jpg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image "
+      focusable="false" (click)="regirectToRepo()"/>
     <div class="card-footer text-muted">
       <div class="d-flex justify-content-between">
-        <span class="pi pi-users clickable" (click)="openModal()">{{repositoryResponse.numberOfUsers}}</span>
+        <span class="pi pi-users" (click)="openModal()" [ngClass]="{'clickable':  repositoryResponse.repository?.ownerId ===  appUserId}">{{repositoryResponse.numberOfUsers}}</span>
         <span class="pi pi-file-o">{{repositoryResponse.numberOfPosts}}</span>
       </div>
     </div>
   </div>
-  <app-list-edit-repo-users *ngIf="isModalOpen" [ownerId]="repositoryResponse.repository?.ownerId!" (closeModalEmitter)="closeModal()" [isModalOpen]="isModalOpen" [repoId]="repositoryResponse.repository!.id!"
+  <app-list-edit-repo-users *ngIf="isModalOpen && repositoryResponse.repository?.ownerId ===  appUserId"    [ownerId]="repositoryResponse.repository?.ownerId!" (closeModalEmitter)="closeModal()" [isModalOpen]="isModalOpen && repositoryResponse.repository?.ownerId ===  appUserId" [repoId]="repositoryResponse.repository!.id!"
   (userNumberUpdateEmitter) = "updateUserNumber($event)"></app-list-edit-repo-users>
 
 </div>

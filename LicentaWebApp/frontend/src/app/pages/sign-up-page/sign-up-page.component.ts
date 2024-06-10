@@ -6,6 +6,7 @@ import { CustomAlertService } from '../../services/custom-alert.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { RegistrationDTO } from '../../client/client';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-sign-up-page',
@@ -21,8 +22,11 @@ export class SignUpPageComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authServive: AuthService,
     private customAlertService: CustomAlertService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private titleService: TitleService
+  ) {
+    this.titleService.setTitle('Sign Up');
+  }
 
   ngOnInit() {
     this.initForm();
@@ -56,12 +60,11 @@ export class SignUpPageComponent implements OnInit {
     this.subcriptions.push(
       this.authServive.register(newUser).subscribe({
         next: (response) => {
-            this.isLoading = false;
-            this.customAlertService.successSnackBarNotAutoClose(
-              'A confiremation email has been sent to your email address. Please confirm your email to login.'
-            );
-            this.router.navigate(['/auth/login']);
-          
+          this.isLoading = false;
+          this.customAlertService.successSnackBarNotAutoClose(
+            'A confiremation email has been sent to your email address. Please confirm your email to login.'
+          );
+          this.router.navigate(['/auth/login']);
         },
         error: (error) => {
           this.isLoading = false;

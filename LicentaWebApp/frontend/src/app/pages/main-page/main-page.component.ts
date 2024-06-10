@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { PostResponse } from '../../client/client';
 import { PostService } from '../../services/post.service';
 import { CustomAlertService } from '../../services/custom-alert.service';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-main-page',
@@ -18,8 +19,10 @@ export class MainPageComponent implements OnInit {
   constructor(
     private postService: PostService,
     private changesDetectRef: ChangeDetectorRef,
-    private customAlertService: CustomAlertService
-  ) {}
+    private customAlertService: CustomAlertService,
+    private titleService: TitleService) {
+      this.titleService.setTitle("Home");
+     }
 
   ngOnInit() {
     this.loadPosts();

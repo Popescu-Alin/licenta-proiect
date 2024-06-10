@@ -6,4 +6,4 @@
             <div class="circle-image clickable d-flex justify-content-center align-items-center" (click)="navigateToProfile()"> <em class="pi pi-user"></em> </div>
     </div>
 </div>
-<app-add-post-modal [isModalOpen]="isAddPostModalOpen" (closeModalEmitter)="closeAddPostModal()"></app-add-post-modal>
+<app-add-post-modal *ngIf="isAddPostModalOpen"[isModalOpen]="isAddPostModalOpen" (closeModalEmitter)="closeAddPostModal()"></app-add-post-modal>

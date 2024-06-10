@@ -10,5 +10,13 @@ export class ErrorUtil{
         return this.isHttpError(error) && error.status === 404;
     }
 
+    public static is404ErrorNswag(error: any): boolean {
+        return error.status === 404;
+    }
+
+    public static is403ErrorNswag(error: any): boolean {
+        return error.status === 403;
+    }
+
 }
 

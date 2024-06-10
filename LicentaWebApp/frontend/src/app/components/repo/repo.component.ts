@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Repository, RepositoryResponse } from '../../client/client';
 import { AccessModifiers } from '../../constants/constants';
+import { Route, Router } from '@angular/router';
+import { DataReciverService } from '../../services/data-reciver.service';
+import { UrlUtil } from '../../utils/url-util';
 
 @Component({
   selector: 'app-repo',
@@ -12,10 +15,18 @@ export class RepoComponent implements OnInit {
   @Input() repositoryResponse: RepositoryResponse | undefined;
   accessModifiers = AccessModifiers;
 
+  appUserId: string | undefined;
+
+  urlUtil = UrlUtil;
+
   isModalOpen = false;  
-  constructor() { }
+  constructor( private router: Router,
+              private dataRecever: DataReciverService
+  ) {
+   }
 
   ngOnInit() {
+    this.appUserId = this.dataRecever.getApplicationUserId();
   }
 
   openModal(){
@@ -28,6 +39,10 @@ export class RepoComponent implements OnInit {
 
   updateUserNumber(number: number){
     this.repositoryResponse!.numberOfUsers = number;
+  }
+
+  regirectToRepo(){
+    this.router.navigate(['/repo', this.repositoryResponse!.repository!.id!]);
   }
 
 }

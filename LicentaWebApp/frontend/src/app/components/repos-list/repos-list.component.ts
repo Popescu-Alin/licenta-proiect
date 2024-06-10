@@ -9,7 +9,7 @@ import { Repository, RepositoryResponse } from '../../client/client';
 export class ReposListComponent implements OnInit {
 
   @Input() repositorysResponses: RepositoryResponse[] | undefined;
-
+  @Input() showAddButton: boolean = false;
   isModalOpen = false;
 
   constructor() { }
@@ -26,7 +26,6 @@ export class ReposListComponent implements OnInit {
   }
   
   repositoryEmitter(repository: Repository) {
-    console.log(repository);
     let repositoryResponse: RepositoryResponse = new RepositoryResponse({
       repository: repository,
       numberOfUsers: 1,

@@ -1,12 +1,16 @@
 <div class="d-flex flex-row p-0 m-0 border-buttom">
   <div class="m-20 w-40">
-    <img class="rounded-circle" src="{{user.imageURL}}" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
-    {{user.imageURL}}</div>
+    <img class="rounded-circle" *ngIf="user.imageURL" src="{{urlUtil.getFullUrl(user.imageURL!)}}" width="30"
+      height="30" aria-label="Placeholder: Image " focusable="false" />
+    <img class="rounded-circle" *ngIf="!user.imageURL" src="../../../assets/default-images/user-image.png" width="30" height="30"
+      aria-label="Placeholder: Image " focusable="false" />
+
+  </div>
   <div class="m-20 w-300">
     {{user.userName}}
   </div>
-  <div class="m-20 w-100px">
-    <div *ngIf="!isEditModeOpen">{{user.userPrivileges}}</div>
+  <!-- <div class="m-20 w-100px">
+     <div *ngIf="!isEditModeOpen">{{user.userPrivileges}}</div> 
     <div *ngIf="isEditModeOpen">
 
       <form [formGroup]="userForm">
@@ -18,16 +22,16 @@
         </div>
       </form>
     </div>
-  </div>
+  </div> -->
   <div class="m-20 w-100px" *ngIf="canEdit">
     <div *ngIf="!isEditModeOpen">
-      <em class=" clickable pi pi-pencil ps-1" (click)="editUser()"></em>
+      <!-- <em class=" clickable pi pi-pencil ps-1" (click)="editUser()"></em> -->
       <em class=" clickable pi pi-trash ps-1" (click)="deleteUser()"></em>
     </div>
-    <div *ngIf="isEditModeOpen">
+    <!-- <div *ngIf="isEditModeOpen">
       <em class=" clickable pi pi-check-circle ps-1" (click)="saveChanges()"></em>
       <em class=" clickable pi pi-times-circle ps-1" (click)="cancelChanges()"></em>
-    </div>
+    </div> -->
 
   </div>
 </div>

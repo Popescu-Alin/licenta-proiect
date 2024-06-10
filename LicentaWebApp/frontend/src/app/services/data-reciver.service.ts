@@ -1,7 +1,7 @@
 import { Token } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { LogInTokenRepsone } from '../client/client';
+import { BasicUserInfo, LogInTokenRepsone } from '../client/client';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +26,18 @@ export class DataReciverService {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('user', JSON.stringify(User));
     }
+  }
+
+  getUserBasicInfo(): BasicUserInfo | undefined {
+    const userData = this.getUserData();
+    if (userData) {
+      return new BasicUserInfo({
+        userId: userData.userId,
+        userName: userData.userName,
+        imageURL: userData.imageURL,
+      });
+    }
+    return undefined;
   }
 
   getUserData(): LogInTokenRepsone | undefined {

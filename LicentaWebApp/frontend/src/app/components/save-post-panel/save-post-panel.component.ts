@@ -11,6 +11,7 @@ import { CustomAlertService } from '../../services/custom-alert.service';
 import { RepoService } from '../../services/repo.service';
 import { AddToRepoResponse, LogInTokenRepsone } from '../../client/client';
 import { AccessModifiers } from '../../constants/constants';
+import { UrlUtil } from '../../utils/url-util';
 
 @Component({
   selector: 'app-save-post-panel',
@@ -29,7 +30,7 @@ export class SavePostPanelComponent implements OnInit {
   isActionLoading = false;
   addToRepoResponses: AddToRepoResponse[] | undefined;
   userData: LogInTokenRepsone | undefined;
-
+  urlUtil = UrlUtil
   constructor(
     private dataReciver: DataReciverService,
     private customAlertService: CustomAlertService,

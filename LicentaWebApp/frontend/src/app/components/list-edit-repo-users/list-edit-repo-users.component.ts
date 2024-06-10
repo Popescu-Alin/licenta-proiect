@@ -9,6 +9,7 @@ import { CustomAlertService } from '../../services/custom-alert.service';
 import { DataReciverService } from '../../services/data-reciver.service';
 import { Privilages } from '../../constants/constants';
 import { UserService } from '../../services/user.service';
+import { UrlUtil } from '../../utils/url-util';
 
 @Component({
   selector: 'app-list-edit-repo-users',
@@ -34,6 +35,8 @@ export class ListEditRepoUsersComponent implements OnInit {
   appUserId: string | undefined;
   privileges = Privilages;
 
+  urlUtil=  UrlUtil;
+  
   constructor(
     private repoService: RepoService,
     private alertService: CustomAlertService,
@@ -65,7 +68,8 @@ export class ListEditRepoUsersComponent implements OnInit {
     this.isAddUserMenuOpen = !this.isAddUserMenuOpen;
   }
 
-  async search(string: string) {
+  async search(event: Event,string: string) {
+    event.preventDefault();
     this.isLoadingSearch = true;
     try {
       this.userBasicInfos =

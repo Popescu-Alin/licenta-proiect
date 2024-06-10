@@ -65,4 +65,7 @@ export class PostComponent implements OnInit {
       this.router.navigate(['/post', postId]);
     }
   }
+
+  
+
 }

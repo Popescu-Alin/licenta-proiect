@@ -1,0 +1,73 @@
+<div class="page-content full-height d-flex flex-column">
+  <form class="align-self-center d-flex pb-1">
+    <input type="text" class="search-input" #inputValue>
+    <span class="pi pi-search clickable ps-1 align-items-center" (click)="search($event,inputValue.value)"></span>
+    <input type="submit" class="d-none" value="Search" (click)="search($event,inputValue.value)">
+  </form>
+
+  <ng-container *ngIf="isLoadingPosts || isLoadingUsers ;else dataLoaded">
+    <div class="full-width full-height d-flex justify-content-center align-items-center">
+      <div class="circle-ripple"></div>
+    </div>
+  </ng-container>
+  <ng-template #dataLoaded>
+    <ng-container *ngIf="hasResults; else noResults">
+      <div class="overflow-y w-500 align-self-center p-1">
+      <ng-container *ngFor="let user of users">
+        <div class="d-flex flex-row p-0 m-0 border-buttom clickable" (click)="redirectToUserPage(user.userId!)">
+          <div class="m-20 w-40">
+            <img class="rounded-circle" *ngIf="user.imageURL" src="{{urlUtil.getFullUrl(user.imageURL!)}}" width="30"
+              height="30" aria-label="Placeholder: Image " focusable="false" />
+            <img class="rounded-circle" *ngIf="!user.imageURL" src="../../../assets/default-images/user-image.png"
+              width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+
+          </div>
+          <div class="m-20 w-300">
+            {{user.userName}}
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngFor="let post of posts">
+
+        <div class="card mb-3 full-width border-buttom pe-1">
+          <div class="card-header d-flex justify-content-between ">
+            <span>
+              <a href="/profile/{{post.userInfo?.userId}}" class="text-decoration-none">
+                <img *ngIf="post.userInfo?.imageURL" src={{urlUtil.getFullUrl(post.userInfo?.imageURL!)}}
+                  class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+                <img *ngIf="!post.userInfo?.imageURL" src="../../../assets/default-images/user-image.png"
+                  class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+                <span class="text-muted ps-1">{{post!.userInfo?.userName}}</span>
+              </a>
+            </span>
+          </div>
+          <div class="card-body clickable" style="padding: 1px;" (click)="redirectToPostPage(post.post?.id!)">
+            <img src={{urlUtil.getFullUrl(post.post?.url!)}} class="d-block user-select-none" width="100%" height="200"
+              aria-label="Placeholder: Image " focusable="false" />
+          </div>
+          <div class="card-footer text-muted">
+            <div class="d-flex justify-content-between">
+              <span class="align-self-center">{{post.numberOfLikes}}
+                <em class="clickable pi pi-thumbs-up "></em>
+              </span>
+              <span class="align-self-center">{{post.numberOfComments}} <em class="pi pi-comments"></em></span>
+            </div>
+          </div>
+            </div>
+      </ng-container>
+    </div>
+    </ng-container>
+
+    <ng-template #noResults>
+      <div class="full-width full-height d-flex flex-column justify-content-center align-items-center">
+        <em class="pi pi-search fs-rem-7 p-1"></em>
+        <div class="text-muted">No results found</div>
+      </div>
+    </ng-template>
+    
+    
+    
+  </ng-template>
+
+
+</div>

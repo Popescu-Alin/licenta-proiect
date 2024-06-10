@@ -12,7 +12,7 @@
             <div class="w-40 m-20 d-flex"><span class="pi-plus-circle pi align-self-center clickable"
                 (click)="openCloseAddUserMenu()"></span></div>
             <div class="w-300 m-20 d-flex"><span>User name</span></div>
-            <div class="w-100px m-20 d-flex"><span>Privileges</span></div>
+            <!-- <div class="w-100px m-20 d-flex"><span>Privileges</span></div> -->
             <div class="w-100px m-20 d-flex" *ngIf="isOwner"><span>Actions</span></div>
           </div>
 
@@ -28,17 +28,19 @@
             </div>
           </div>
           <div *ngIf="isAddUserMenuOpen" class="d-flex flex-column justify-content-center">
-            <div class="align-self-center d-flex">
+            <form class="align-self-center d-flex"  >
               <input type="text" class="search-input" #inputValue>
-              <span class="pi pi-search clickable ps-1 align-items-center" (click)="search(inputValue.value)"></span>
-            </div>
+              <span class="pi pi-search clickable ps-1 align-items-center" (click)="search($event,inputValue.value)"></span>
+              <input type="submit" class="d-none" value="Search" (click)="search($event,inputValue.value)">
+            </form>
             <div class="overflow-auto h-250px">
               <ng-container *ngFor="let user of userBasicInfos; let i = index">
                 <div class="d-flex">
                   <div class="m-20 w-40">
-                    <img class="rounded-circle" src="{{user.imageURL}}" width="30" height="30"
+                    <img class="rounded-circle" *ngIf="user.imageURL" [src]="urlUtil.getFullUrl(user.imageURL)" width="30" height="30"
                       aria-label="Placeholder: Image " focusable="false" />
-                    {{user.imageURL}}
+                    <img class="rounded-circle" *ngIf="!user.imageURL" src="../../../assets/default-images/user-image.png" width="30"
+                      height="30" aria-label="Placeholder: Image " focusable="false" />
                   </div>
                   <div class="m-20 w-300">
                     {{user.userName}}
@@ -55,7 +57,14 @@
 
       </ng-container>
 
-      <ng-template #noData></ng-template>
+      <ng-template #noData>
+        <div class="full-width full-height justify-content-center align-items-center">
+          <div class="align-self-center d-flex flex-column align-items-center">
+            <span class="pi pi-ban fs-rem-7"></span>
+            <span class="text-muted fs-rem-1">No data availabel</span>
+          </div>
+        </div>
+      </ng-template>
 
     </ng-template>
   </div>

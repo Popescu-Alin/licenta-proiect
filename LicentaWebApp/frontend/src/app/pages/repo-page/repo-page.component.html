@@ -1,0 +1,107 @@
+<div class="page-content p-0 m-0">
+  <ng-container *ngIf="!isRepoLoading; else isLoadingRepo">
+
+    <div *ngIf="!isEditMode" class="d-flex justify-content-center pb-3">
+      <input type="text" class="search-input" value="{{repo?.repository?.title}}" readonly>
+      <span class="text-muted align-self-center pi ps-2 pe-2"
+        [ngClass]="{'pi-globe': repo?.repository!.accessModifier == accessModifiers.Public, 'pi-lock':repo?.repository!.accessModifier == accessModifiers.Private}"></span>
+
+      <em class="pi pi-pencil clickable ps-2 pe-2 align-self-center" (click)="openEditMode()"
+        *ngIf="appUserId == repo?.repository?.ownerId"></em>
+      <em class="pi pi-trash clickable ps-2 align-self-center" (click)="deleteRepo()"
+        *ngIf="appUserId == repo?.repository?.ownerId"></em>
+    </div>
+
+    <div *ngIf="isEditMode">
+      <form class="d-flex flex-row p-3 justify-content-center" [formGroup]="repoForm">
+
+        <div class="pe-2">
+          <input type="text" class="form-control" formControlName="title" placeholder="Title">
+          <div *ngIf="repoForm.controls['title'].errors?.['requierd']" class="invalid-feedback">Value is required</div>
+        </div>
+
+        <div class="pe-2 ps-2">
+          <select class="form-control" formControlName="accessModifier">
+            <option value="Public" selected="Public">Public</option>
+            <option value="Private">Private</option>
+          </select>
+        </div>
+
+        <em class="pi pi-check-circle pe-2 ps-2 align-self-center" [ngClass]="{'clickable': repoForm.valid}" (click)="saveRepo()"></em>
+        <em class="pi pi-times-circle clickable ps-2 align-self-center" (click)="closeEditMode()"></em>
+      </form>
+    </div>
+
+    <ng-container *ngIf="!isLoadingPosts; else isLoading">
+      <div class="full-width full-height d-flex flex-row justify-content-center">
+        <div style=" width: 1050px;" class="d-flex flex-row flex-wrap justify-content-around "
+          *ngIf="postResponses && postResponses.length > 0;else noData">
+          <div *ngFor="let postResponse of postResponses">
+            <div class="card mb-3 w-500" *ngIf="postResponse">
+              <div class="card-header d-flex justify-content-between ">
+                <span>
+                  <a href="/profile/{{postResponse.userInfo?.userId}}" class="text-decoration-none">
+                    <img *ngIf="postResponse.userInfo?.imageURL"
+                      src={{urlUtil.getFullUrl(postResponse.userInfo?.imageURL!)}} class="rounded-circle" width="30"
+                      height="30" aria-label="Placeholder: Image " focusable="false" />
+                    <img *ngIf="!postResponse.userInfo?.imageURL" src="../../../assets/default-images/user-image.png"
+                      class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image "
+                      focusable="false" />
+                    <span class="text-muted ps-1">{{postResponse!.userInfo?.userName}}</span>
+                  </a>
+                </span>
+                <span class="text-muted align-self-center">{{postResponse!.post?.createdDate | date:'short'}}</span>
+              </div>
+              <div class="card-body clickable" style="padding: 1px;" (click)="redirectToPost(postResponse.post?.id)">
+                <img src={{urlUtil.getFullUrl(postResponse.post?.url!)}} class="d-block user-select-none" width="100%"
+                  height="200" aria-label="Placeholder: Image " focusable="false" />
+              </div>
+              <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+
+                  <span class="align-self-center">{{postResponse.numberOfLikes}}
+                    <em class="clickable pi " (click)="likeDislikePost(postResponse.post?.id!)"
+                      [ngClass]="{'pi-thumbs-up-fill ': postResponse.isLiked, 'pi-thumbs-up': !postResponse.isLiked}"></em>
+                  </span>
+
+                  <span class="align-self-center">{{postResponse.numberOfComments}} <em
+                      class="pi pi-comments"></em></span>
+
+                  <em class="clickable pi pi-trash align-self-center" *ngIf="repo && repo.canRemovePost == true"
+                    (click)="removePost(postResponse!.post?.id!)"></em>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noData>
+          <div class="full-width full-height justify-content-center align-items-center">
+            <div class="align-self-center d-flex flex-column align-items-center">
+              <span class="pi pi-ban fs-rem-7"></span>
+              <span class="text-muted fs-rem-1">Empty repository</span>
+            </div>
+          </div>
+        </ng-template>
+
+      </div>
+    </ng-container>
+
+    <ng-template #isLoading>
+      <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoading">
+        <div class="circle-ripple"></div>
+      </div>
+    </ng-template>
+  </ng-container>
+
+
+  <ng-template #isLoadingRepo>
+    <div class="full-width full-height d-flex justify-content-center align-items-center">
+      <div class="circle-ripple"></div>
+    </div>
+  </ng-template>
+
+
+
+
+</div>

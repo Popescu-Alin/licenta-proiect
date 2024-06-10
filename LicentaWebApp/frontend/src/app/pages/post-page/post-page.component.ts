@@ -9,6 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorUtil } from '../../utils/error-util';
 import { LikeDislikeService } from '../../services/like-dislike.service';
 import { UrlUtil } from '../../utils/url-util';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-post-page',
@@ -34,8 +35,10 @@ export class PostPageComponent implements OnInit {
     private route: ActivatedRoute,
     private dataReciver: DataReciverService,
     private router: Router,
-    private likeDislikeService: LikeDislikeService
-  ) {}
+    private likeDislikeService: LikeDislikeService,
+    private titleService: TitleService) {
+      this.titleService.setTitle("Post");
+     }
 
   ngOnInit(): void {
     this.appUserId = this.dataReciver.getApplicationUserId();
@@ -52,8 +55,8 @@ export class PostPageComponent implements OnInit {
     this.isLoadingPost = true;
     try {
       this.postResponse = await this.postService.getPost(this.postId);
-    } catch (error) {
-      if (ErrorUtil.is404Error(error)) {
+    } catch (error: any | unknown) {
+      if (ErrorUtil.is404ErrorNswag(error)) {
         this.router.navigate(['/404']);
       } else {
         this.postResponse = undefined;
@@ -107,11 +110,21 @@ export class PostPageComponent implements OnInit {
     if (this.pathSubscription) this.pathSubscription.unsubscribe();
   }
 
-  openDescription() {
-    this.isDescriptionOpen = true;
+  updateCommentNumber(number: number) {
+    if (this.postResponse) {
+      this.postResponse.numberOfComments! += number;
+    }
   }
 
-  closeDescription() {
-    this.isDescriptionOpen = false;
+  async deletePost() {
+    if (!this.postResponse) {
+      return;
+    }
+    try {
+      await this.postService.deletePost(this.postResponse.post!.id!);
+      this.router.navigate(['/home']);
+    } catch (e) {
+      this.alertService.genericErrorMessage();
+    }
   }
 }

@@ -18,6 +18,9 @@
     <div class="d-flex justify-content-center">
       <button type="button" class="btn btn-link" (click)="goToSignUpPage()"> Not registered? Create an account! </button>
     </div>
+    <div class="d-flex justify-content-center">
+      <button type="button" class="btn btn-link" (click)="goToForgotPasswordPage()"> Forgotten password </button>
+    </div>
   </div>
 </div>
 <app-email-not-confirmed-modal [email]="email" (closeModalEmitter)="closeModal()" [isModalOpen]="showConfirmEmail"></app-email-not-confirmed-modal>

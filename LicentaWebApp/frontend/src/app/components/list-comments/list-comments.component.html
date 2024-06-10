@@ -6,17 +6,12 @@
   </ng-container>
   <ng-template #dataLoaded>
     <div class="full-width full-height d-flex flex-column bg-secondeary border-color">
-      <div class="full-width full-height d-flex flex-column">
+      <div class="full-width full-height d-flex flex-column overflow-y">
         <ng-container *ngIf="mainComments?.totalCount && mainComments?.collection; else noComments">
           <div class="p-1" *ngFor="let comment of mainComments?.collection">
-            <div class="d-flex flex-row">
-              <div class="d-flex flex-column">
-  
-                <span class="text-muted">
-                  comment: {{comment.comment?.content}}
-                </span>
-              </div>
-            </div>
+                
+            <app-comment [comment]="comment!" (deletedComment)="deleteComment($event)"></app-comment>
+              
           </div>
   
         </ng-container>

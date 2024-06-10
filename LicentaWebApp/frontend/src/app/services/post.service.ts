@@ -39,4 +39,14 @@ export class PostService {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.uploadPostImage(image).toPromise();
   }
+
+  searchPost(search: string): Promise<PostResponse[] | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.searchPost(search).toPromise();
+  }
+
+  deletePost(postId: string): Promise<boolean | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.deletePost(postId).toPromise();
+  }
 }

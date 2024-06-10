@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Client, RegistrationDTO, AuthDTO, LogInTokenRepsone } from '../client/client';
+import { Client, RegistrationDTO, AuthDTO, LogInTokenRepsone, PasswordReset } from '../client/client';
 import { promises } from 'dns';
 import { DataReciverService } from './data-reciver.service';
 
@@ -31,5 +31,13 @@ export class AuthService {
   isAuth(): Promise<boolean | undefined> {
     this.client.setAuthToken(this.dataReciver.getToken()!);
     return this.client.isAuth().toPromise();
+  }
+
+  sendResetPasswordMail(email: string): Promise<boolean | undefined> {
+    return this.client.sendResetPasswordMail(email).toPromise();
+  }
+  
+  resetPassword(body: PasswordReset): Promise<boolean | undefined> {
+    return this.client.changePassword(body).toPromise();
   }
 }

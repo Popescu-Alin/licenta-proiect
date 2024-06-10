@@ -9,9 +9,11 @@ import { PostService } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
 import { CustomAlertService } from '../../services/custom-alert.service';
 import { RepoService } from '../../services/repo.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DataReciverService } from '../../services/data-reciver.service';
 import { UrlUtil } from '../../utils/url-util';
+import { ErrorUtil } from '../../utils/error-util';
+import { TitleService } from '../../services/title.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -33,8 +35,8 @@ export class ProfilePageComponent {
 
   isModalOpen: boolean = false;
 
-  urlUtil =  UrlUtil;
-  
+  urlUtil = UrlUtil;
+
   constructor(
     private postService: PostService,
     private alertService: CustomAlertService,
@@ -42,20 +44,24 @@ export class ProfilePageComponent {
     private changesDetectRef: ChangeDetectorRef,
     private repoService: RepoService,
     private route: ActivatedRoute,
+    private router: Router,
     private dataReciver: DataReciverService,
-  ) {}
-
+    private titleService: TitleService
+  ) {
+    this.titleService.setTitle('Profile');
+  }
 
   ngOnInit(): void {
     this.appUserId = this.dataReciver.getApplicationUserId();
-    this.pathSubscription = this.route.paramMap.subscribe(params => {
+    this.pathSubscription = this.route.paramMap.subscribe((params) => {
       this.userId = this.route.snapshot.paramMap.get('id');
-    this.loadUserData();
+      this.loadUserData();
+      this.isPostListShown = true;
     });
   }
 
   async loadUserData() {
-    if(!this.userId){
+    if (!this.userId) {
       return;
     }
     this.isLoadingUser = true;
@@ -63,6 +69,9 @@ export class ProfilePageComponent {
       this.userData = await this.userService.getUserProfile(this.userId!);
       this.loadPosts();
     } catch (error) {
+      if (ErrorUtil.is404ErrorNswag(error)) {
+        this.router.navigate(['/404']);
+      }
       this.userData = undefined;
       this.alertService.errorSnackBar('Failed to load user profile data.');
     } finally {
@@ -77,7 +86,11 @@ export class ProfilePageComponent {
     }
     this.isLoadingPosts = true;
     try {
-      this.postResponses = await this.postService.getPostsByUserId(11,0,this.userId!);
+      this.postResponses = await this.postService.getPostsByUserId(
+        11,
+        0,
+        this.userId!
+      );
     } catch (error) {
       this.postResponses = undefined;
     } finally {
@@ -92,7 +105,8 @@ export class ProfilePageComponent {
     }
     this.isLoadingRepos = true;
     try {
-      this.reposResponses = await this.repoService.getReposByUserId(this.userId!);
+      this.reposResponses =
+        await this.repoService.getAccesibleReposforUserProfile(this.userId!);
     } catch (error) {
       this.userData = undefined;
     } finally {
@@ -111,23 +125,21 @@ export class ProfilePageComponent {
     this.loadRepos();
   }
 
-  openModal(){
+  openModal() {
     this.isModalOpen = true;
   }
 
-  closeModal(){
+  closeModal() {
     this.isModalOpen = false;
   }
 
-  changeProfileURL(newURL: string){
-    if(this.userData){
+  changeProfileURL(newURL: string) {
+    if (this.userData) {
       this.userData.imageURL = newURL;
     }
   }
 
   ngOnDestroy(): void {
-   if(this.pathSubscription)
-      this.pathSubscription.unsubscribe();
+    if (this.pathSubscription) this.pathSubscription.unsubscribe();
   }
-
 }

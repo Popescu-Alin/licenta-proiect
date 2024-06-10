@@ -58,6 +58,7 @@ export class AddPostModalComponent implements OnInit {
         this.postResponseEmitter.emit(postResponse);
         this.isLoading = false;
         this.customAlertService.successSnackBar('Post added successfully');
+        this.closeModalEmitter.emit();
       }
     }catch(error){
       this.customAlertService.genericErrorMessage();

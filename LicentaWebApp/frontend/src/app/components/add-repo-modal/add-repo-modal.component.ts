@@ -58,6 +58,7 @@ export class AddRepoModalComponent implements OnInit {
       this.repoForm.reset();
       this.initForm();
     }
+    this.closeModalEmitter.emit();
   }
 
 }

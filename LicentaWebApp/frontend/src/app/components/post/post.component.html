@@ -2,8 +2,10 @@
   <div class="card-header d-flex justify-content-between ">
     <span>
       <a href="/profile/{{postResponse.userInfo?.userId}}" class="text-decoration-none">
-        <img *ngIf="postResponse.userInfo?.imageURL" src={{urlUtil.getFullUrl(postResponse.userInfo?.imageURL!)}} class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
-        <img *ngIf="!postResponse.userInfo?.imageURL" src="../../../assets/default-images/user-image.png" class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+        <img *ngIf="postResponse.userInfo?.imageURL" src={{urlUtil.getFullUrl(postResponse.userInfo?.imageURL!)}}
+          class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
+        <img *ngIf="!postResponse.userInfo?.imageURL" src="../../../assets/default-images/user-image.png"
+          class="rounded-circle" width="30" height="30" aria-label="Placeholder: Image " focusable="false" />
         <span class="text-muted ps-1">{{postResponse!.userInfo?.userName}}</span>
       </a>
     </span>
@@ -11,22 +13,24 @@
   </div>
   <div class="card-body clickable" style="padding: 1px;" (click)="redirectToPost(postResponse.post?.id)">
     <img src={{urlUtil.getFullUrl(postResponse.post?.url!)}} class="d-block user-select-none" width="100%" height="200"
-    aria-label="Placeholder: Image " focusable="false" />
+      aria-label="Placeholder: Image " focusable="false" />
   </div>
   <div class="card-footer text-muted">
     <div class="d-flex justify-content-between">
 
-      <span>{{postResponse.numberOfLikes}}
+      <span class="align-self-center">{{postResponse.numberOfLikes}}
         <em class="clickable pi " (click)="likeDislikePost()"
-          [ngClass]="{'isLiked pi-thumbs-up-fill ': postResponse.isLiked, 'pi-thumbs-up': !postResponse.isLiked}"></em>
+          [ngClass]="{'pi-thumbs-up-fill ': postResponse.isLiked, 'pi-thumbs-up': !postResponse.isLiked}"></em>
       </span>
 
-      <span>{{postResponse.numberOfComments}} {{ postResponse.numberOfComments == 1 ? 'comment':'comments'}}</span>
+      <span class="align-self-center">{{postResponse.numberOfComments}} <em class="pi pi-comments"></em></span>
 
-      <em class="clickable pi" (click)="openSavePanel()"
+      <em class="clickable pi align-self-center" (click)="openSavePanel()"
         [ngClass]="{'pi-bookmark-fill': postResponse.isSaved, 'pi-bookmark': !postResponse.isSaved}"></em>
 
+      
     </div>
   </div>
-  <app-save-post-panel *ngIf="savePanelOpen" [isModalOpen]="savePanelOpen" (closeModalEmitter)="closeSavePanel()" (responseEmitter)="updateSaveStatus($event)" [postId]="postResponse.post!.id!"></app-save-post-panel>
+  <app-save-post-panel *ngIf="savePanelOpen" [isModalOpen]="savePanelOpen" (closeModalEmitter)="closeSavePanel()"
+    (responseEmitter)="updateSaveStatus($event)" [postId]="postResponse.post!.id!"></app-save-post-panel>
 </div>

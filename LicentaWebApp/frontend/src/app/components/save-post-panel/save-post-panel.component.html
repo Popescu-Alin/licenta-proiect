@@ -1,16 +1,18 @@
 <app-modal [isOpen]="isModalOpen" [title]="''" (closeModalEmitter)="closeModalEmitter.emit()">
 
     <ng-container *ngIf="isLoading; else dataLoaded">
-        <div class="full-width full-height d-flex justify-content-center align-items-center" *ngIf="isLoading">
+        <div class="full-width full-height d-flex justify-content-center align-items-center w-500"
+            style="height: 300px;" *ngIf="isLoading">
             <div class="circle-ripple"></div>
         </div>
     </ng-container>
     <ng-template #dataLoaded>
         <ng-container *ngIf="addToRepoResponses && addToRepoResponses.length > 0; else noData">
             <div class="d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-center " >
+                <div class="d-flex justify-content-between align-items-center w-500 flex-wrap overflow-y p-1"
+                    style="height: 300px;">
                     <div *ngFor="let repo of addToRepoResponses">
-                        <div class="card mb-3 square-240px" >
+                        <div class="card mb-3 square-240px">
                             <div class="card-header d-flex justify-content-between ">
                                 <span>
                                     {{repo.repository!.title}}
@@ -18,13 +20,18 @@
                                 <span class="text-muted align-self-center pi "
                                     [ngClass]="{'pi-globe': repo.repository!.accessModifier == accessModifiers.Public, 'pi-lock':repo.repository!.accessModifier == accessModifiers.Private}"></span>
                             </div>
-                            <img src="" class="d-block user-select-none" width="100%" height="200"
-                                aria-label="Placeholder: Image " focusable="false" />
+                            <img *ngIf="repo.imageURL != null" [src]="urlUtil.getFullUrl(repo!.imageURL!)" class="d-block user-select-none" width="100%" height="160" aria-label="Placeholder: Image "
+                            focusable="false" />
+                            <img *ngIf="repo.imageURL == null" src="../../../assets/bg.jpg" class="d-block user-select-none" width="100%" height="160" aria-label="Placeholder: Image "
+                            focusable="false" />
+                            
                             <div class="card-footer text-muted">
                                 <div class="d-flex justify-content-between">
                                     <span class="pi pi-users">{{repo.numberOfUsers}}</span>
-                                    <span class="clickable pi pi-plus-circle p-0" *ngIf="!repo.isPostSavedInRepo" (click)="addToRepo(repo.repository?.id!)"></span>
-                                    <span class="clickable pi pi-minus-circle p-0" *ngIf="repo.isPostSavedInRepo" (click)="removeFromRepo(repo.repository?.id!)"></span>
+                                    <span class="clickable pi pi-plus-circle p-0" *ngIf="!repo.isPostSavedInRepo"
+                                        (click)="addToRepo(repo.repository?.id!)"></span>
+                                    <span class="clickable pi pi-minus-circle p-0" *ngIf="repo.isPostSavedInRepo"
+                                        (click)="removeFromRepo(repo.repository?.id!)"></span>
                                     <span class="pi pi-file-o">{{repo.numberOfPosts}}</span>
                                 </div>
                             </div>
@@ -34,7 +41,15 @@
             </div>
         </ng-container>
 
-        <ng-template #noData></ng-template>
+        <ng-template #noData>
+            <div class="full-width full-height justify-content-center align-items-center">
+                <div class="align-self-center d-flex flex-column align-items-center">
+                    <span class="pi pi-ban fs-rem-7"></span>
+                    <span class="text-muted fs-rem-1">No data availabel</span>
+                </div>
+            </div>
+
+        </ng-template>
 
     </ng-template>
 

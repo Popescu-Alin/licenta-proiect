@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { DataReciverService } from '../../services/data-reciver.service';
 import { Router } from '@angular/router';
 import { CustomAlertService } from '../../services/custom-alert.service';
+import { TitleService } from '../../services/title.service';
 
 
 @Component({
@@ -24,7 +25,10 @@ export class LoginPageComponent implements OnInit {
               private authService: AuthService,
               private dataReciver: DataReciverService,
               private router: Router,
-              private customAlertSevcice: CustomAlertService) { }
+              private customAlertSevcice: CustomAlertService,
+              private titleService: TitleService) {
+                this.titleService.setTitle("Login");
+               }
 
   ngOnInit() {
     this.initForm();
@@ -45,7 +49,6 @@ export class LoginPageComponent implements OnInit {
         if(token.confirmedEmail){
           this.dataReciver.setToken(token.token);
           this.dataReciver.setUserData(token);
-          this.customAlertSevcice.successSnackBar("Login successful!");
           this.router.navigate(['/home']);
           this.dataReciver.setIsLogedIn(true);
         }else{
@@ -65,6 +68,10 @@ export class LoginPageComponent implements OnInit {
 
   goToSignUpPage(){
     this.router.navigate(['/auth/sign-up']);
+  }
+
+  goToForgotPasswordPage(){
+    this.router.navigate(['/auth/forgotten-password']);
   }
 
   closeModal(){

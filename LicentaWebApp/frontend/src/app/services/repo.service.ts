@@ -4,8 +4,10 @@ import {
   AddToRepoResponse,
   BasicUserInfo,
   Client,
+  PostResponse,
   RepoUserBasicInfo,
   Repository,
+  RepositoryPageResponse,
   RepositoryResponse,
   UserRepository,
 } from '../client/client';
@@ -70,4 +72,28 @@ export class RepoService {
     return this.client.updateUserRepo(userRepo).toPromise();
   }
 
+  getPostsByRepoId(repoId: string): Promise<PostResponse[] | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getRepoPosts(repoId).toPromise();
+  }
+
+  getAccesibleReposforUserProfile(userId: string): Promise<RepositoryResponse[] | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getAccesibleUserProfileRepos(userId).toPromise();
+  }
+
+  getRepo(repoId: string): Promise<RepositoryPageResponse | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.getRepo(repoId).toPromise();
+  }
+
+  updateRepo(repo: Repository): Promise<Repository | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.updateRepo(repo.id!, repo).toPromise();
+  }
+
+  deleteRepo(repoId: string): Promise<boolean | undefined> {
+    this.client.setAuthToken(this.dataReciver.getToken()!);
+    return this.client.deleteRepo(repoId).toPromise();
+  }
 }

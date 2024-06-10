@@ -71,7 +71,9 @@ namespace LicentaBackEnd.Service
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
                 EmailConfirmed = false,
-                ProfilePicture = ""
+                ProfilePicture = "",
+                Description = ""
+                
             };
             IdentityResult result = _userManager.CreateAsync(user, entity.Password).Result;
             result = _userManager.AddToRoleAsync(user, UserTypes.User).Result;

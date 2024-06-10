@@ -1,18 +1,22 @@
-<div class="full-height">
+<div class="full-height align-self-center">
+  <div *ngIf="showAddButton && repositorysResponses && repositorysResponses.length>0 " class="d-flex flex-row-reverse p-1"> <span class="pi pi-plus-circle clickable fs-rem-2 pe-3 align-self-end" (click)="openModal()"></span></div>
 
   <ng-container *ngIf="repositorysResponses && repositorysResponses.length>0; else noRepos">
-    <div *ngFor="let repo of repositorysResponses">
-      <app-repo [repositoryResponse]="repo"></app-repo>
+    <div style="width: 1050px;" class="justify-content-around d-flex align-items-center flex-wrap">
+      <div *ngFor="let repo of repositorysResponses">
+        <app-repo [repositoryResponse]="repo" ></app-repo>
+      </div>
     </div>
   </ng-container>
-  
+
   <ng-template #noRepos>
     <div class="full-width full-height d-flex flex-column  justify-content-center align-items-center">
       <span class="fs-3 text-color-black">No repositories</span>
-      <span class="btn btn-link" (click)="openModal()">Add a repository?</span>
+      <span class="btn btn-link" (click)="openModal()" *ngIf="showAddButton">Add a repository?</span>
     </div>
-    <app-add-repo-modal [isModalOpen]="isModalOpen" (closeModalEmitter)="closeModal()" (repositoryEmitter)="repositoryEmitter($event)"></app-add-repo-modal>
+   
   </ng-template>
-  
 
+  <app-add-repo-modal *ngIf="isModalOpen" [isModalOpen]="isModalOpen" (closeModalEmitter)="closeModal()"
+  (repositoryEmitter)="repositoryEmitter($event)"></app-add-repo-modal>
 </div>
