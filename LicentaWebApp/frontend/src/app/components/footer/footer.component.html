@@ -3,7 +3,12 @@
             <em class="pi pi-home clickable" style="font-size: 1.5rem;" (click)="navigateTo('/home')"></em>
             <em class="pi pi-plus-circle clickable" style="font-size: 1.5rem;" (click)="openModal()"></em>
             <em class="pi pi-search clickable" style="font-size: 1.5rem;" (click)="navigateTo('/search')"></em>
-            <div class="circle-image clickable d-flex justify-content-center align-items-center" (click)="navigateToProfile()"> <em class="pi pi-user"></em> </div>
-    </div>
+            <div class="align-self-center circle-image dropdown-container clickable d-flex justify-content-center align-items-center" (click)="openMenu()"> <em class="pi pi-user"></em> 
+                <div class="dropdown-content d-flex flex-column" *ngIf="isMenuOpen">
+                    <a (click)="navigateToProfile()" class="btn link-btn">Profile</a>
+                    <a (click)="logout()" class="btn link-btn">Logout</a>
+                </div>
+            </div>
+        </div>
 </div>
 <app-add-post-modal *ngIf="isAddPostModalOpen"[isModalOpen]="isAddPostModalOpen" (closeModalEmitter)="closeAddPostModal()"></app-add-post-modal>

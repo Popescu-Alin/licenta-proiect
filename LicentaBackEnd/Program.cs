@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(auth =>
         RequireExpirationTime = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("iohwefhwefbwefwebfwededededednfwk")),
         ValidateIssuerSigningKey = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
     };
 
 
